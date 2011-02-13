@@ -1,7 +1,6 @@
 /**
  * This file belongs to the BPELUnit utility and Eclipse plugin set. See enclosed
  * license file for more information.
- * 
  */
 package net.bpelunit.framework.control.soap;
 
@@ -28,15 +27,14 @@ import net.bpelunit.framework.model.test.activity.ActivityContext;
  * @author Philip Mayer, Daniel Luebke
  * 
  */
-public class WSAHeaderProcessor implements IHeaderProcessor {
+public abstract class WSAHeaderProcessor implements IHeaderProcessor {
 
 	private static final String WSA_TAG_RELATES_TO = "RelatesTo";
 	private static final String WSA_TAG_ADDRESS = "Address";
 	private static final String WSA_TAG_REPLY_TO = "ReplyTo";
 	private static final String WSA_TAG_FAULT_TO = "FaultTo";
 	private static final String WSA_TAG_MESSAGE_ID = "MessageID";
-	private static final String WSA2003_NAMESPACE = "http://schemas.xmlsoap.org/ws/2003/03/addressing";
-	private static final String WSA2004_NAMESPACE = "http://schemas.xmlsoap.org/ws/2004/08/addressing";
+
 	private static final String WSA_RECEIVED = "WSA-Received";
 	private static final String WSA_RECEIVED_ADDRESS = "WSA-Received-Address";
 	private static final String WSA_RECEIVED_ID = "WSA-Received-ID";
@@ -47,7 +45,6 @@ public class WSAHeaderProcessor implements IHeaderProcessor {
 			+ Math.abs((long) (Math.random() * 100000000));
 	private String expectedRelatesTo = null; // filled in when message is sent
 	private boolean validateRelatesTo = false;
-	private String wsaNamespace = WSA2003_NAMESPACE;
 	private String replyToURI = null;
 	private String faultToURI = null;
 
@@ -91,9 +88,10 @@ public class WSAHeaderProcessor implements IHeaderProcessor {
 			messageID = "";
 		}
 
-		if (replyTo == null)
-			throw new HeaderProcessingException(
-					"Reply-To address not found in incoming message.");
+		// TODO Whether a replyTo is really a mandatory part in a WSA header
+//		if (replyTo == null)
+//			throw new HeaderProcessingException(
+//					"Reply-To address not found in incoming message.");
 
 		context.setUserData(WSA_RECEIVED, "true");
 		context.setUserData(WSA_RECEIVED_ID, messageID);
@@ -112,11 +110,11 @@ public class WSAHeaderProcessor implements IHeaderProcessor {
 
 	private String extractReplyTo(SOAPHeader header) {
 		String replyTo = null;
-		for (Iterator<?> i = header.getChildElements(new QName(wsaNamespace,
+		for (Iterator<?> i = header.getChildElements(new QName(getWsaNamespace(),
 				WSA_TAG_REPLY_TO)); i.hasNext();) {
 			SOAPElement soapElement = (SOAPElement) i.next();
 			for (Iterator<?> j = soapElement.getChildElements(new QName(
-					wsaNamespace, WSA_TAG_ADDRESS)); j.hasNext();) {
+					getWsaNamespace(), WSA_TAG_ADDRESS)); j.hasNext();) {
 				SOAPElement soapElement2 = (SOAPElement) j.next();
 				replyTo = soapElement2.getTextContent();
 			}
@@ -124,8 +122,10 @@ public class WSAHeaderProcessor implements IHeaderProcessor {
 		return replyTo;
 	}
 
+	protected abstract String getWsaNamespace();
+
 	private String extractMessageId(SOAPHeader header) {
-		for (Iterator<?> i = header.getChildElements(new QName(wsaNamespace,
+		for (Iterator<?> i = header.getChildElements(new QName(getWsaNamespace(),
 				WSA_TAG_MESSAGE_ID)); i.hasNext();) {
 			SOAPElement soapElement = (SOAPElement) i.next();
 			return soapElement.getTextContent();
@@ -135,7 +135,7 @@ public class WSAHeaderProcessor implements IHeaderProcessor {
 	}
 
 	private String extractRelatesTo(SOAPHeader header) {
-		for (Iterator<?> i = header.getChildElements(new QName(wsaNamespace,
+		for (Iterator<?> i = header.getChildElements(new QName(getWsaNamespace(),
 				WSA_TAG_RELATES_TO)); i.hasNext();) {
 			SOAPElement soapElement = (SOAPElement) i.next();
 			return soapElement.getTextContent();
@@ -188,16 +188,16 @@ public class WSAHeaderProcessor implements IHeaderProcessor {
 	}
 
 	private void addMessageId(SOAPHeader header) throws SOAPException {
-		SOAPElement msgId = header.addChildElement(new QName(wsaNamespace,
+		SOAPElement msgId = header.addChildElement(new QName(getWsaNamespace(),
 				WSA_TAG_MESSAGE_ID));
 		msgId.setTextContent(messageId);
 	}
 
 	private void addReplyTo(SOAPHeader header, String replyToURI)
 			throws SOAPException {
-		SOAPElement replyTo = header.addChildElement(new QName(wsaNamespace,
+		SOAPElement replyTo = header.addChildElement(new QName(getWsaNamespace(),
 				WSA_TAG_REPLY_TO));
-		SOAPElement address = replyTo.addChildElement(new QName(wsaNamespace,
+		SOAPElement address = replyTo.addChildElement(new QName(getWsaNamespace(),
 				WSA_TAG_ADDRESS));
 
 		address.setTextContent(replyToURI);
@@ -205,9 +205,9 @@ public class WSAHeaderProcessor implements IHeaderProcessor {
 
 	private void addFaultTo(SOAPHeader header, String faultToURI)
 			throws SOAPException {
-		SOAPElement faultTo = header.addChildElement(new QName(wsaNamespace,
+		SOAPElement faultTo = header.addChildElement(new QName(getWsaNamespace(),
 				WSA_TAG_FAULT_TO));
-		SOAPElement address = faultTo.addChildElement(new QName(wsaNamespace,
+		SOAPElement address = faultTo.addChildElement(new QName(getWsaNamespace(),
 				WSA_TAG_ADDRESS));
 
 		address.setTextContent(faultToURI);
@@ -238,7 +238,7 @@ public class WSAHeaderProcessor implements IHeaderProcessor {
 	private void addRelatesTo(String messageID, SOAPHeader header)
 			throws HeaderProcessingException {
 		try {
-			SOAPElement msgId = header.addChildElement(new QName(wsaNamespace,
+			SOAPElement msgId = header.addChildElement(new QName(getWsaNamespace(),
 					WSA_TAG_RELATES_TO));
 			msgId.setTextContent(messageID);
 		} catch (SOAPException e) {
@@ -252,26 +252,11 @@ public class WSAHeaderProcessor implements IHeaderProcessor {
 		this.messageId = messageId;
 	}
 
-	public void setWSAVersion(String version) {
-		if ("2003".equals(version) || "".equals(version)) {
-			wsaNamespace = WSA2003_NAMESPACE;
-		} else if ("2004".equals(version)) {
-			wsaNamespace = WSA2004_NAMESPACE;
-		} else {
-			throw new IllegalArgumentException(
-					"WS-Addressing Version may only be 2003 or 2004");
-		}
-	}
-
 	public void setProperty(String name, String value) {
 		// TODO JDK 7: Switch to switch(name)
 		// TODO Switch API to deployer-like annotations
 		if ("MessageId".equals(name)) {
 			setMessageId(value);
-		}
-
-		if ("WSAVersion".equals(name)) {
-			setWSAVersion(value);
 		}
 
 		if ("ExpectedRelatesTo".equals(name)) {
