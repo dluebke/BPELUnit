@@ -5,8 +5,8 @@
  */
 package net.bpelunit.framework;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.File;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;

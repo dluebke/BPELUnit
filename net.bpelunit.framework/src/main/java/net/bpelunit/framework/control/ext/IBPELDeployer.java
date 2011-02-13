@@ -99,18 +99,6 @@ public interface IBPELDeployer {
 			throws DeploymentException;
 
 	/**
-	 * Adds configuration options for this deployment instance. The
-	 * configuration options are loaded from the test suite document.
-	 * 
-	 * This method is called before any of the other methods.
-	 * 
-	 * @see #getConfigurationParameters()
-	 * @param options
-	 *            the options
-	 */
-
-	// public void setConfiguration(Map<String, String> options);
-	/**
 	 * Gets the corresponding IDeployment implementation for this deployer.
 	 * 
 	 * @param processUnderTest

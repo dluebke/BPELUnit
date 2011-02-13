@@ -44,14 +44,11 @@ public class WSAHeaderProcessor implements IHeaderProcessor {
 	private static final String WSA_SENT_ID = "WSA-Sent-ID";
 
 	private String messageId = "BPELUnit-"
-			+ Math.abs((long)Math.random() * 100000000);
-	private String expectedMessageId = null;
+			+ Math.abs((long) (Math.random() * 100000000));
 	private String expectedRelatesTo = null; // filled in when message is sent
 	private boolean validateRelatesTo = false;
 	private String wsaNamespace = WSA2003_NAMESPACE;
-	private String replyToPartnerTrack = null;
 	private String replyToURI = null;
-	private String faultToPartnerTrack = null;
 	private String faultToURI = null;
 
 	public WSAHeaderProcessor() {
@@ -59,6 +56,17 @@ public class WSAHeaderProcessor implements IHeaderProcessor {
 
 	public void processReceive(ActivityContext context, SOAPMessage message)
 			throws HeaderProcessingException {
+
+		SOAPHeader header = getSOAPHeader(message);
+
+		if (validateRelatesTo) {
+			String relatesTo = extractRelatesTo(header);
+
+			if (relatesTo == null || expectedRelatesTo == null
+					|| !expectedRelatesTo.equals(relatesTo)) {
+				throw new HeaderProcessingException("Wrong <RelatesTo> in WS-Addressing header: '" + expectedRelatesTo + "' but was '" + relatesTo + "'");
+			}
+		}
 
 		// Two options: Either this is part one in a receive-send, or part two
 		// in a send/receive
@@ -68,48 +76,72 @@ public class WSAHeaderProcessor implements IHeaderProcessor {
 			// nothing to do
 		} else {
 			// this is (presumably) part one
-			// get message ID and reply-To-Adress
-			SOAPHeader header;
-			try {
-				header = message.getSOAPHeader();
-			} catch (SOAPException e) {
-				throw new HeaderProcessingException(
-						"Incoming SOAP message did not have a SOAP Header.", e);
-			}
-
-			// Retrieve message ID
-			String messageID = null;
-			for (Iterator<?> i = header.getChildElements(new QName(
-					wsaNamespace, WSA_TAG_MESSAGE_ID)); i.hasNext();) {
-				SOAPElement soapElement = (SOAPElement) i.next();
-				messageID = soapElement.getTextContent();
-			}
-
-			// Retrieve reply to
-			String replyTo = null;
-			for (Iterator<?> i = header.getChildElements(new QName(
-					wsaNamespace, WSA_TAG_REPLY_TO)); i.hasNext();) {
-				SOAPElement soapElement = (SOAPElement) i.next();
-				for (Iterator<?> j = soapElement.getChildElements(new QName(
-						wsaNamespace, WSA_TAG_ADDRESS)); j.hasNext();) {
-					SOAPElement soapElement2 = (SOAPElement) j.next();
-					replyTo = soapElement2.getTextContent();
-				}
-			}
-
-			if (messageID == null)
-				messageID = "";
-			// throw new
-			// HeaderProcessingException("Message ID not found in incoming message.");
-
-			if (replyTo == null)
-				throw new HeaderProcessingException(
-						"Reply-To address not found in incoming message.");
-
-			context.setUserData(WSA_RECEIVED, "true");
-			context.setUserData(WSA_RECEIVED_ID, messageID);
-			context.setUserData(WSA_RECEIVED_ADDRESS, replyTo);
+			processReceiveOfReceiveSend(context, message);
 		}
+	}
+
+	private void processReceiveOfReceiveSend(ActivityContext context,
+			SOAPMessage message) throws HeaderProcessingException {
+		SOAPHeader header = getSOAPHeader(message);
+
+		String messageID = extractMessageId(header);
+		String replyTo = extractReplyTo(header);
+
+		if (messageID == null) {
+			messageID = "";
+		}
+
+		if (replyTo == null)
+			throw new HeaderProcessingException(
+					"Reply-To address not found in incoming message.");
+
+		context.setUserData(WSA_RECEIVED, "true");
+		context.setUserData(WSA_RECEIVED_ID, messageID);
+		context.setUserData(WSA_RECEIVED_ADDRESS, replyTo);
+	}
+
+	private SOAPHeader getSOAPHeader(SOAPMessage message)
+			throws HeaderProcessingException {
+		try {
+			return message.getSOAPHeader();
+		} catch (SOAPException e) {
+			throw new HeaderProcessingException(
+					"Incoming SOAP message did not have a SOAP Header.", e);
+		}
+	}
+
+	private String extractReplyTo(SOAPHeader header) {
+		String replyTo = null;
+		for (Iterator<?> i = header.getChildElements(new QName(wsaNamespace,
+				WSA_TAG_REPLY_TO)); i.hasNext();) {
+			SOAPElement soapElement = (SOAPElement) i.next();
+			for (Iterator<?> j = soapElement.getChildElements(new QName(
+					wsaNamespace, WSA_TAG_ADDRESS)); j.hasNext();) {
+				SOAPElement soapElement2 = (SOAPElement) j.next();
+				replyTo = soapElement2.getTextContent();
+			}
+		}
+		return replyTo;
+	}
+
+	private String extractMessageId(SOAPHeader header) {
+		for (Iterator<?> i = header.getChildElements(new QName(wsaNamespace,
+				WSA_TAG_MESSAGE_ID)); i.hasNext();) {
+			SOAPElement soapElement = (SOAPElement) i.next();
+			return soapElement.getTextContent();
+		}
+
+		return null;
+	}
+
+	private String extractRelatesTo(SOAPHeader header) {
+		for (Iterator<?> i = header.getChildElements(new QName(wsaNamespace,
+				WSA_TAG_RELATES_TO)); i.hasNext();) {
+			SOAPElement soapElement = (SOAPElement) i.next();
+			return soapElement.getTextContent();
+		}
+
+		return null;
 	}
 
 	public void processSend(ActivityContext context, SendPackage sendSpec)
@@ -118,76 +150,101 @@ public class WSAHeaderProcessor implements IHeaderProcessor {
 		// Two options: Either this is part one in a send/receive, or part two
 		// in a receive/send.
 		if (context.getUserData(WSA_RECEIVED).equals("true")) {
-			// we are sending back
-			String targetURL = context.getUserData(WSA_RECEIVED_ADDRESS);
-			String messageID = context.getUserData(WSA_RECEIVED_ID);
-
-			if (targetURL == null)
-				throw new HeaderProcessingException(
-						"Target URL from presumed receive was empty.");
-
-			if (messageID == null)
-				throw new HeaderProcessingException(
-						"Message ID from presumed receive was empty.");
-
-			SOAPMessage msg = sendSpec.getSoapMessage();
-			SOAPHeader header;
-			try {
-				header = msg.getSOAPHeader();
-			} catch (SOAPException e) {
-				throw new HeaderProcessingException(
-						"No SOAP header in outgoing SOAP message.", e);
-			}
-
-			if (!messageID.equals("")) {
-				SOAPElement msgId;
-				try {
-					msgId = header.addChildElement(new QName(wsaNamespace,
-							WSA_TAG_RELATES_TO));
-				} catch (SOAPException e) {
-					throw new HeaderProcessingException(
-							"Could not add relatesTo child element to outgoing SOAP message.",
-							e);
-				}
-				msgId.setTextContent(messageID);
-			}
-
-			sendSpec.setTargetURL(targetURL);
-
+			processSendOfReceiveSend(context, sendSpec);
 		} else {
-			// we are first, so this is a send-receive activity
-			// add reply-to and message ID to the SOAP message
-			SOAPMessage msg = sendSpec.getSoapMessage();
-			SOAPHeader header;
-			try {
-				header = msg.getSOAPHeader();
-			} catch (SOAPException e) {
-				throw new HeaderProcessingException(
-						"No SOAP header in outgoing SOAP message.", e);
+			processSendOfSendReceive(context, sendSpec);
+		}
+	}
+
+	private void processSendOfSendReceive(ActivityContext context,
+			SendPackage sendSpec) throws HeaderProcessingException {
+
+		// we are first, so this is a send-receive activity
+		// add reply-to and message ID to the SOAP message
+		try {
+			SOAPHeader header = getSOAPHeader(sendSpec.getSoapMessage());
+
+			addMessageId(header);
+			this.expectedRelatesTo = this.messageId;
+
+			if (replyToURI == null) {
+				addReplyTo(header, context.getPartnerURL());
+			} else {
+				addReplyTo(header, replyToURI);
 			}
 
-			try {
-				// Message ID
-				SOAPElement msgId = header.addChildElement(new QName(
-						wsaNamespace, WSA_TAG_MESSAGE_ID));
-				msgId.setTextContent(messageId);
-
-				// Reply To
-				SOAPElement replyTo = header.addChildElement(new QName(
-						wsaNamespace, WSA_TAG_REPLY_TO));
-				SOAPElement address = replyTo.addChildElement(new QName(
-						wsaNamespace, WSA_TAG_ADDRESS));
-
-				address.setTextContent(context.getPartnerURL());
-
-				// store this
-				context.setUserData(WSA_SENT, "true");
-				context.setUserData(WSA_SENT_ID, messageId);
-			} catch (SOAPException e) {
-				throw new HeaderProcessingException(
-						"Could not add MessageID, ReplyTo or Address child element to outgoing SOAP message.",
-						e);
+			if (faultToURI != null) {
+				addFaultTo(header, faultToURI);
 			}
+
+			// store this
+			context.setUserData(WSA_SENT, "true");
+			context.setUserData(WSA_SENT_ID, messageId);
+		} catch (SOAPException e) {
+			throw new HeaderProcessingException(
+					"Could not add MessageID, ReplyTo or Address child element to outgoing SOAP message.",
+					e);
+		}
+	}
+
+	private void addMessageId(SOAPHeader header) throws SOAPException {
+		SOAPElement msgId = header.addChildElement(new QName(wsaNamespace,
+				WSA_TAG_MESSAGE_ID));
+		msgId.setTextContent(messageId);
+	}
+
+	private void addReplyTo(SOAPHeader header, String replyToURI)
+			throws SOAPException {
+		SOAPElement replyTo = header.addChildElement(new QName(wsaNamespace,
+				WSA_TAG_REPLY_TO));
+		SOAPElement address = replyTo.addChildElement(new QName(wsaNamespace,
+				WSA_TAG_ADDRESS));
+
+		address.setTextContent(replyToURI);
+	}
+
+	private void addFaultTo(SOAPHeader header, String faultToURI)
+			throws SOAPException {
+		SOAPElement faultTo = header.addChildElement(new QName(wsaNamespace,
+				WSA_TAG_FAULT_TO));
+		SOAPElement address = faultTo.addChildElement(new QName(wsaNamespace,
+				WSA_TAG_ADDRESS));
+
+		address.setTextContent(faultToURI);
+	}
+
+	private void processSendOfReceiveSend(ActivityContext context,
+			SendPackage sendSpec) throws HeaderProcessingException {
+		String targetURL = context.getUserData(WSA_RECEIVED_ADDRESS);
+		String messageID = context.getUserData(WSA_RECEIVED_ID);
+
+		if (targetURL == null)
+			throw new HeaderProcessingException(
+					"Target URL from presumed receive was empty.");
+
+		if (messageID == null)
+			throw new HeaderProcessingException(
+					"Message ID from presumed receive was empty.");
+
+		SOAPHeader header = getSOAPHeader(sendSpec.getSoapMessage());
+
+		if (!messageID.equals("")) {
+			addRelatesTo(messageID, header);
+		}
+
+		sendSpec.setTargetURL(targetURL);
+	}
+
+	private void addRelatesTo(String messageID, SOAPHeader header)
+			throws HeaderProcessingException {
+		try {
+			SOAPElement msgId = header.addChildElement(new QName(wsaNamespace,
+					WSA_TAG_RELATES_TO));
+			msgId.setTextContent(messageID);
+		} catch (SOAPException e) {
+			throw new HeaderProcessingException(
+					"Could not add relatesTo child element to outgoing SOAP message.",
+					e);
 		}
 	}
 
@@ -207,6 +264,8 @@ public class WSAHeaderProcessor implements IHeaderProcessor {
 	}
 
 	public void setProperty(String name, String value) {
+		// TODO JDK 7: Switch to switch(name)
+		// TODO Switch API to deployer-like annotations
 		if ("MessageId".equals(name)) {
 			setMessageId(value);
 		}
@@ -215,56 +274,47 @@ public class WSAHeaderProcessor implements IHeaderProcessor {
 			setWSAVersion(value);
 		}
 
-		if ("ExpectedMessageId".equals(name)) {
-			setExpectedMessageId(value);
-		}
-
 		if ("ExpectedRelatesTo".equals(name)) {
 			setExpectedRelatesTo(value);
 		}
-	}
 
-	public void setExpectedMessageId(String expectedMessageId) {
-		this.expectedMessageId = expectedMessageId;
+		if ("ReplyToURI".equals(name)) {
+			setReplyToURI(value);
+		}
+
+		if ("FaultToURI".equals(name)) {
+			setFaultToURI(value);
+		}
+		
+		if("ValidateRelatesTo".equals(name)) {
+			setValidateRelatesTo(value);
+		}
 	}
 
 	public void setExpectedRelatesTo(String expectedRelateToId) {
 		this.expectedRelatesTo = expectedRelateToId;
-	}
-
-	public void setReplyToPartnerTrack(String replyToPartnerTrack) {
-		this.replyToPartnerTrack = replyToPartnerTrack;
-
-		if (replyToURI != null) {
-			throw new IllegalArgumentException(
-					"Only one of ReplyToPartnerTrack and ReplyToURL is allowed.");
-		}
+		this.validateRelatesTo = true;
 	}
 
 	public void setReplyToURI(String replyToURL) {
 		this.replyToURI = replyToURL;
-
-		if (replyToPartnerTrack != null) {
-			throw new IllegalArgumentException(
-					"Only one of ReplyToPartnerTrack and ReplyToURL is allowed.");
-		}
-	}
-
-	public void setFaultToPartnerTrack(String faultToPartnerTrack) {
-		this.faultToPartnerTrack = faultToPartnerTrack;
-
-		if (faultToURI != null) {
-			throw new IllegalArgumentException(
-					"Only one of FaultToPartnerTrack and FaultToURL is allowed.");
-		}
 	}
 
 	public void setFaultToURI(String faultToURL) {
 		this.faultToURI = faultToURL;
-
-		if (faultToPartnerTrack != null) {
-			throw new IllegalArgumentException(
-					"Only one of FaultToPartnerTrack and FaultToURL is allowed.");
+	}
+	
+	public void setValidateRelatesTo(String validateRelatesTo) {
+		if(validateRelatesTo.toLowerCase().equals("true")) {
+			setValidateRelatesTo(true);
+		} else if(validateRelatesTo.toLowerCase().equals("false")) {
+			setValidateRelatesTo(false);
+		} else {
+			throw new IllegalArgumentException("Wrong value for ValidateRelatesTo: " + validateRelatesTo + ": must be 'true' or 'false'");
 		}
+	}
+	
+	public void setValidateRelatesTo(boolean validateRelatesTo) {
+		this.validateRelatesTo = validateRelatesTo;
 	}
 }

@@ -5,7 +5,6 @@
  */
 package net.bpelunit.test.unit;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -16,7 +15,6 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.xpath.XPathExpressionException;
 
-import net.bpelunit.framework.control.ext.IHeaderProcessor;
 import net.bpelunit.framework.control.ext.SendPackage;
 import net.bpelunit.framework.control.soap.NamespaceContextImpl;
 import net.bpelunit.framework.control.soap.WSAHeaderProcessor;
@@ -33,8 +31,7 @@ import org.w3c.dom.Node;
  * 
  * Tests the WSA Header Processor
  * 
- * @version $Id: TestWSAHeaderProcessor.java,v 1.5 2006/07/11 14:27:43 phil Exp
- *          $
+ * @version $Id: TestWSAHeaderProcessor.java,v 1.5 2006/07/11 14:27:43 phil Exp$
  * @author Philip Mayer
  * 
  */
@@ -80,9 +77,7 @@ public class TestWSAHeaderProcessor extends SimpleTest {
 		if(namespaceURI.equals(NAMESPACE_WSA_2004)) {
 			fileName = "incomingSOAP_WSA2004.xml";
 		}
-		
-		SOAPMessage rcvMessage = factory.createMessage(null, this.getClass()
-				.getResourceAsStream(PATH_TO_FILES + fileName));
+		SOAPMessage rcvMessage = createMessageFromFile(fileName);
 
 		wsaProcessor.processReceive(activityContext, rcvMessage);
 
@@ -101,9 +96,7 @@ public class TestWSAHeaderProcessor extends SimpleTest {
 		assertEquals("http://return.to.me/", p.getTargetURL());
 		Element header = p.getSoapMessage().getSOAPHeader();
 
-		NamespaceContextImpl ns = new NamespaceContextImpl();
-		ns.setNamespace("wsa",
-				namespaceURI);
+		NamespaceContextImpl ns = createNamespaceContext(namespaceURI);
 
 		Node msgId = TestUtil.getNode(header, ns, "wsa:RelatesTo");
 		assertEquals(messageId, msgId.getTextContent());
@@ -123,8 +116,7 @@ public class TestWSAHeaderProcessor extends SimpleTest {
 
 	private void testWSAHeadersSendReceive(String namespaceURI) throws IOException, SOAPException,
 			HeaderProcessingException, XPathExpressionException {
-		SOAPMessage sendMessage = factory.createMessage(null, this.getClass()
-				.getResourceAsStream(PATH_TO_FILES + "outgoingSOAP.xml"));
+		SOAPMessage sendMessage = createMessageFromFile("outgoingSOAP.xml");
 
 		SendPackage p = new SendPackage("http://target.url", sendMessage);
 		wsaProcessor.processSend(activityContext, p);
@@ -135,9 +127,8 @@ public class TestWSAHeaderProcessor extends SimpleTest {
 		 */
 
 		Element header = p.getSoapMessage().getSOAPHeader();
-		NamespaceContextImpl ns = new NamespaceContextImpl();
-		ns.setNamespace("wsa",
-				namespaceURI);
+		NamespaceContextImpl ns = createNamespaceContext(namespaceURI);
+		
 		Node msgId = TestUtil.getNode(header, ns, "wsa:MessageID");
 		assertTrue(msgId.getTextContent().startsWith("BPELUnit-"));
 		Node replyTo = TestUtil.getNode(header, ns, "wsa:ReplyTo/wsa:Address");
@@ -149,8 +140,7 @@ public class TestWSAHeaderProcessor extends SimpleTest {
 
 		// Receive something back (doesn't really matter actually)
 
-		SOAPMessage rcvMessage = factory.createMessage(null, this.getClass()
-				.getResourceAsStream(PATH_TO_FILES + "incomingSOAP2.xml"));
+		SOAPMessage rcvMessage = createMessageFromFile("incomingSOAP2.xml");
 		wsaProcessor.processReceive(activityContext, rcvMessage);
 	}
 
@@ -160,19 +150,134 @@ public class TestWSAHeaderProcessor extends SimpleTest {
 		
 		wsaProcessor.setMessageId(expectedMessageId);
 
-		MessageFactory factory = MessageFactory.newInstance();
-		SOAPMessage sendMessage = factory.createMessage(null, this.getClass()
-				.getResourceAsStream(PATH_TO_FILES + "outgoingSOAP.xml"));
-		
+		SOAPMessage sendMessage = createMessageFromFile("outgoingSOAP.xml");
 		SendPackage p = new SendPackage("http://target.url", sendMessage);
+		
 		wsaProcessor.processSend(activityContext, p);
 		
 		Element header = p.getSoapMessage().getSOAPHeader();
-		NamespaceContextImpl ns = new NamespaceContextImpl();
-		ns.setNamespace("wsa",
-				NAMESPACE_WSA_2003);
+		NamespaceContextImpl ns = createNamespaceContext(NAMESPACE_WSA_2003);
 		Node msgId = TestUtil.getNode(header, ns, "wsa:MessageID");
 		
 		assertEquals(expectedMessageId, msgId.getTextContent());
+	}
+
+	private NamespaceContextImpl createNamespaceContext(String wsaNamespace) {
+		NamespaceContextImpl ns = new NamespaceContextImpl();
+		ns.setNamespace("wsa", wsaNamespace);
+		return ns;
+	}
+
+	private SOAPMessage createMessageFromFile(String fileName)
+			throws SOAPException, IOException {
+		SOAPMessage sendMessage = factory.createMessage(null, this.getClass()
+				.getResourceAsStream(PATH_TO_FILES + fileName));
+		return sendMessage;
+	}
+	
+	@Test
+	public void testImplicitReplyTo() throws Exception {
+		SOAPMessage sendMessage = createMessageFromFile("outgoingSOAP.xml");
+		SendPackage p = new SendPackage("http://target.url", sendMessage);
+		
+		wsaProcessor.processSend(activityContext, p);
+		
+		NamespaceContextImpl ns = createNamespaceContext(NAMESPACE_WSA_2003);
+		Node replyToAddress = TestUtil.getNode(sendMessage.getSOAPHeader(), ns, "//wsa:ReplyTo/wsa:Address");
+		
+		assertEquals("http://simulated.url", replyToAddress.getTextContent());
+	}
+	
+	@Test
+	public void testSetReplyToWithoutFaultTo() throws Exception {
+		wsaProcessor.setReplyToURI("http://localhost");
+		
+		SOAPMessage sendMessage = createMessageFromFile("outgoingSOAP.xml");
+		SendPackage p = new SendPackage("http://target.url", sendMessage);
+		
+		wsaProcessor.processSend(activityContext, p);
+		
+		NamespaceContextImpl ns = createNamespaceContext(NAMESPACE_WSA_2003);
+		Node replyToAddress = TestUtil.getNode(sendMessage.getSOAPHeader(), ns, "//wsa:ReplyTo/wsa:Address");
+		
+		assertEquals("http://localhost", replyToAddress.getTextContent());
+	}
+	
+	@Test
+	public void testSetReplyToAndFaultTo() throws Exception {
+		wsaProcessor.setReplyToURI("http://localhost/reply");
+		wsaProcessor.setFaultToURI("http://localhost/fault");
+		
+		SOAPMessage sendMessage = createMessageFromFile("outgoingSOAP.xml");
+		SendPackage p = new SendPackage("http://target.url", sendMessage);
+		
+		wsaProcessor.processSend(activityContext, p);
+		
+		NamespaceContextImpl ns = createNamespaceContext(NAMESPACE_WSA_2003);
+		Node replyToAddress = TestUtil.getNode(sendMessage.getSOAPHeader(), ns, "//wsa:ReplyTo/wsa:Address");
+		Node faultToAddress = TestUtil.getNode(sendMessage.getSOAPHeader(), ns, "//wsa:FaultTo/wsa:Address");
+		
+		assertEquals("http://localhost/reply", replyToAddress.getTextContent());
+		assertEquals("http://localhost/fault", faultToAddress.getTextContent());
+	}
+	
+	@Test
+	public void testSuccessfulExpectedRelatesTo() throws Exception {
+		String relatesToFromFile = "kjasdhfjsdbksjdgdsrhfdgjkdfjk2";
+		wsaProcessor.setExpectedRelatesTo(relatesToFromFile);
+		
+		SOAPMessage message = createMessageFromFile("incomingSOAP.xml");
+		
+		wsaProcessor.processReceive(activityContext, message);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testValidateRelatesTo() throws Exception {
+		wsaProcessor.setValidateRelatesTo("some-wrong-value");
+	}
+	
+	@Test
+	public void testSuccessfulRelatesToFromOwnSend() throws Exception {
+		wsaProcessor.setValidateRelatesTo("true");
+		
+		SOAPMessage message = createMessageFromFile("outgoingSOAP.xml");
+		SendPackage p = new SendPackage("http://simulated.url", message);
+		
+		wsaProcessor.processSend(activityContext, p);
+		NamespaceContextImpl ns = createNamespaceContext(NAMESPACE_WSA_2003);
+		String msgId = TestUtil.getNode(message.getSOAPHeader(), ns, "wsa:MessageID").getTextContent();
+		
+		message = createMessageFromFile("incomingSOAP.xml");
+		TestUtil.getNode(message.getSOAPHeader(), ns, "wsa:RelatesTo").setTextContent(msgId);
+		
+		wsaProcessor.processReceive(activityContext, message);
+	}
+	
+	@Test(expected=HeaderProcessingException.class)
+	public void testUnsuccessfulRelatesToFromOwnSend() throws Exception {
+		wsaProcessor.setValidateRelatesTo("true");
+		
+		SOAPMessage message = createMessageFromFile("outgoingSOAP.xml");
+		SendPackage p = new SendPackage("http://simulated.url", message);
+		
+		wsaProcessor.processSend(activityContext, p);
+		NamespaceContextImpl ns = createNamespaceContext(NAMESPACE_WSA_2003);
+		String msgId = TestUtil.getNode(message.getSOAPHeader(), ns, "wsa:MessageID").getTextContent();
+		msgId += "wrongId";
+		
+		message = createMessageFromFile("incomingSOAP.xml");
+		TestUtil.getNode(message.getSOAPHeader(), ns, "wsa:RelatesTo").setTextContent(msgId);
+		
+		wsaProcessor.processReceive(activityContext, message);
+	}
+
+	@Test(expected=HeaderProcessingException.class)
+	public void testUnsuccessfulExpectedRelatesTo() throws Exception {
+		String relatesToFromFile = "kjasdhfjsdbksjdgdsrhfdgjkdfjk3";
+		wsaProcessor.setExpectedRelatesTo(relatesToFromFile);
+		
+		SOAPMessage message = createMessageFromFile("incomingSOAP.xml");
+		
+		wsaProcessor.processReceive(activityContext, message);
 	}
 }

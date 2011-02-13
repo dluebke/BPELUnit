@@ -62,17 +62,9 @@ public class ODEDeployment extends GenericDeployment {
 		this.fDescriptorDocument = getDescriptorDocument();
 	}
 
-	// ************* IDeployment Implementation method ********************
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.bpelunit.framework.control.deploy.ode.IDeployment#addLoggingService()
-	 */
 	public void addLoggingService(String wsdl) throws ArchiveFileException {
 		addWSDL(wsdl);
 		prepareDeploymentDescriptor();
-
 	}
 
 	/**
