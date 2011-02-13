@@ -12,7 +12,8 @@
 	<encoder type="document/literal" extensionClass="net.bpelunit.framework.control.soap.DocumentLiteralEncoder" />
 	<encoder type="rpc/literal" extensionClass="net.bpelunit.framework.control.soap.RPCLiteralEncoder" />
 	
-	<headerProcessor type="wsa" extensionClass="net.bpelunit.framework.control.soap.WSAHeaderProcessor" />
+	<headerProcessor type="wsa" extensionClass="net.bpelunit.framework.control.soap.WSA2004HeaderProcessor" />
+	<headerProcessor type="wsadraft" extensionClass="net.bpelunit.framework.control.soap.WSA2003HeaderProcessor" />
 
 	<dataSource type="velocity" extensionClass="net.bpelunit.framework.control.datasource.VelocityDataSource" />
 </extensionRegistry>
