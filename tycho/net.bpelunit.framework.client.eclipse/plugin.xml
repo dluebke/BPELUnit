@@ -178,7 +178,11 @@
       <headerProcessor
             id="wsa"
             name="WS-Adressing Header Processor"
-            processorClass="net.bpelunit.framework.control.soap.WSAHeaderProcessor"/>
+            processorClass="net.bpelunit.framework.control.soap.WSA2004HeaderProcessor"/>
+      <headerProcessor
+            id="wsadraft"
+            name="WS-Adressing Header Processor (WSA Old Draft)"
+            processorClass="net.bpelunit.framework.control.soap.WSA2003HeaderProcessor"/>
    </extension>
    <extension
          point="org.eclipse.help.toc">
