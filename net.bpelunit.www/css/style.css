@@ -1,0 +1,182 @@
+/* LAYOUT */
+
+body {
+  font-family: Verdana;
+  margin: 0px;
+  padding: 0px;
+  font-size: 13px;
+}
+  
+#top {
+  width: 100%;
+  height: 100px;
+  background-repeat: repeat;
+  border-bottom: 1px #000 solid;
+  background-image: url(../images/layout/top_green.png);
+}
+
+#logo {
+  position: relative;
+  float: left;
+  width: 145px;
+  height: 75px;
+  padding-left: 15px;
+  padding-top: 25px;
+  background-image: url(../images/layout/top_gray.png);
+  border-right: 1px solid #000;
+}
+  
+#menu {
+  position: absolute;
+  float: left;
+  left: 161px;
+  height: 100px;
+  font-family: Arial;
+  min-width: 660px;
+  font-size: 14px;
+  border-bottom: 1px #000 solid;
+}
+
+#menu_links {
+  margin-top: 78px;
+}
+  
+.menu_point a {
+  float: left;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 3px;
+  text-decoration: none;
+  color: #fff;
+  height: 19px;
+  font-variant: small-caps;
+}
+  
+.menu_point a:hover {
+  color: #000;
+  background-image: url(../images/layout/menu_hover.png);
+}
+
+.clear {
+  clear: both;
+}
+
+#container {
+  position: relative;
+  width: 100%;
+}
+
+#buttons {
+  position:absolute;
+  top: 100px;
+  left: 0px;
+  width: 160px; 
+}
+
+.line {
+  position:relative;
+  top:0;
+  left: 160px;
+  width: 1px; 
+  height: 400px;
+  background-image: url(../images/layout/line.png);
+}
+
+#content {
+  position:absolute;
+  top:0;
+  left: 181px;
+  right: 181px;
+  padding: 50px 10px 0px 10px;
+}
+
+.line2 {
+  width: 1px;
+  height: 400px;
+  position:absolute;
+  right: 160px;
+  top:0; 
+  background-image: url(../images/layout/line.png);
+}
+
+.right {
+ width: 160px;
+}
+
+
+
+/* INHALT - TITEL */
+
+.pagetitle {
+  font-family: Verdana;
+  font-size: 24px;
+  font-weight: bold;
+  color: #2fc220;
+  font-variant: small-caps;
+}
+
+.pagetitle_image {
+  padding-top: 19px;
+}
+
+h2 {
+  font-family: Verdana;
+  font-size: 20px;
+  font-weight: bold;
+  color: #2fc220;
+  font-variant: small-caps;
+}
+
+}
+
+/* INHALT - EINTRAG */
+
+.date {
+  font-family: Verdana;
+  font-size: 12px;
+  font-weight: bold;
+  color: #aaa;
+  font-variant: small-caps;
+}
+
+.topic {
+  font-family: Verdana;
+  font-size: 14px;
+  font-weight: bold;
+  font-variant: small-caps;
+}
+
+p,li,td {
+  text-align: justify;
+  font-family: Verdana;
+  font-size: 13px;
+}
+
+.author {
+  font-family: Verdana;
+  font-size: 11px;
+  text-align: right;
+  color: #aaa;
+  font-variant: small-caps;
+}
+
+img {
+ border: 0px;
+}
+
+
+
+
+/* INHALT - LINKS */
+a.textlink {
+ color: #2fc220;
+ text-decoration: none;
+}
+
+a:hover.textlink {
+ text-decoration: underline;
+}
+
+a.imagelink {
+ text-decoration: none;
+}
