@@ -1,21 +1,39 @@
 package net.bpelunit.model.bpel;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.apache.xmlbeans.XmlException;
-import org.oasisOpen.docs.wsbpel.x20.process.executable.ProcessDocument;
+import org.apache.commons.io.IOUtils;
 
 public class BpelFactory {
 	private static final String NAMESPACE_BPEL_2_0 = "http://docs.oasis-open.org/wsbpel/2.0/process/executable";
 
+	private static Map<String, IBpelFactory> factories = new HashMap<String, IBpelFactory>();
+	
+	static {
+		BufferedReader properties = new BufferedReader(new InputStreamReader(BpelFactory.class.getResourceAsStream("BpelFactory.properties")));
+		try {
+			String line;
+			while((line = properties.readLine()) != null) {
+				line = line.trim();
+				if(! "".equals(line)) {
+					String[] components = line.split("=");
+					factories.put(components[0], (IBpelFactory) Class.forName(components[1]).newInstance());
+				}
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Error while reading configuration for BpelFactories", e);
+		} finally {
+			IOUtils.closeQuietly(properties);
+		}
+	}
 	
 	public static IProcess loadProcess(InputStream in) throws IOException {
-		try {
-			return new net.bpelunit.model.bpel._2_0.BpelFactory(ProcessDocument.Factory.parse(in)).getProcess();
-		} catch (XmlException e) {
-			throw new IOException("XML Error: " + e.getMessage(), e);
-		}
+		return factories.get(NAMESPACE_BPEL_2_0).loadProcess(in);
 	}
 
 	public static IProcess createProcess() {
@@ -23,11 +41,7 @@ public class BpelFactory {
 	}
 
 	public static IProcess createProcess(String bpelNamespace) {
-		if(NAMESPACE_BPEL_2_0.equals(bpelNamespace)) {
-			return new net.bpelunit.model.bpel._2_0.BpelFactory().getProcess();
-		} else {
-			throw new IllegalArgumentException("No model found for namespace " + bpelNamespace);
-		}
+		return factories.get(bpelNamespace).createProcess();
 	}
 	
 }
