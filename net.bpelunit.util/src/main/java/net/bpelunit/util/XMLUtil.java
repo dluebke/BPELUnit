@@ -142,4 +142,18 @@ public final class XMLUtil {
 			return new QName(n.getNamespaceURI(), n.getNodeName());
 		}
 	}
+	
+	public static void removeAllSubNodesExceptAttributes(Node n) {
+		NodeList children = n.getChildNodes();
+		List<Node> childrenToRemove = new ArrayList<Node>();
+		for (int i = 0; i < children.getLength(); i++) {
+			if (children.item(i).getNodeType() != Node.ATTRIBUTE_NODE) {
+				childrenToRemove.add(children.item(i));
+			}
+		}
+		
+		for(Node child : childrenToRemove) {
+			n.removeChild(child);
+		}
+	}
 }

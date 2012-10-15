@@ -169,16 +169,26 @@ public class XMLUtilTest {
 			nodes = n;
 		}
 		
-		@Override
 		public int getLength() {
 			return nodes.length;
 		}
 
-		@Override
 		public Node item(int index) {
 			return nodes[index];
 		}
 		
+	}
+
+	@Test
+	public void testRemoveAllSubNodesExceptAttributes() throws Exception {
+		Document doc = XMLUtil.parseXML(getClass().getResourceAsStream(
+				"largecontent.xml"));
+				
+		Element e = doc.getDocumentElement();
+		
+		XMLUtil.removeAllSubNodesExceptAttributes(e);
+		assertEquals(0, e.getChildNodes().getLength());
+		assertEquals("test", e.getAttribute("src"));
 	}
 	
 	private String normalize(String s) {
