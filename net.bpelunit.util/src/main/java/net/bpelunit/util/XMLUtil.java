@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -49,6 +50,7 @@ public final class XMLUtil {
 	public static Document parseXML(String xmlAsString) throws SAXException,
 			IOException, ParserConfigurationException {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		dbFactory.setNamespaceAware(true);
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 		return dBuilder.parse(new ByteArrayInputStream(xmlAsString
 				.getBytes("UTF-8")));
@@ -79,56 +81,56 @@ public final class XMLUtil {
 
 	}
 
-	public static void removeNodes(Element parent,
-			NodeList elements) {
+	public static void removeNodes(Element parent, NodeList elements) {
 		// Copy elements in case of NodeList is a live implementation
 		// that would shrink while deleting elments
 		List<Node> nodesToRemove = new ArrayList<Node>();
-		
-		for(int i = 0; i < elements.getLength(); i++) {
+
+		for (int i = 0; i < elements.getLength(); i++) {
 			Node item = elements.item(i);
-			
-			if(item.getParentNode() == parent) {
+
+			if (item.getParentNode() == parent) {
 				nodesToRemove.add(item);
 			}
 		}
-		
-		for(Node n : nodesToRemove) {
+
+		for (Node n : nodesToRemove) {
 			parent.removeChild(n);
 		}
 	}
 
-	public static List<Element> getChildElementsByName(Element element, String localName) {
+	public static List<Element> getChildElementsByName(Element element,
+			String localName) {
 		List<Element> elements = new ArrayList<Element>();
-		
-		for(Element e : getChildElements(element)) {
+
+		for (Element e : getChildElements(element)) {
 			// DOM Level 1 API (document.createElement) creates elements
 			// that have an empty localname
-			if(e.getLocalName() == null && localName.equals(e.getNodeName())) {
+			if (e.getLocalName() == null && localName.equals(e.getNodeName())) {
 				elements.add(e);
-			} else if(localName.equals(e.getLocalName())) {
+			} else if (localName.equals(e.getLocalName())) {
 				elements.add(e);
 			}
 		}
-		
+
 		return elements;
 	}
 
 	public static List<Element> getChildElements(Element element) {
 		NodeList childNodes = element.getChildNodes();
-		
+
 		List<Element> elements = new ArrayList<Element>();
-		for(int i = 0; i < childNodes.getLength(); i++) {
+		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node n = childNodes.item(i);
-			if(n instanceof Element) {
-				elements.add((Element)n);
+			if (n instanceof Element) {
+				elements.add((Element) n);
 			}
 		}
 		return elements;
 	}
 
 	public static void addAsFirstChild(Element element, Element newChild) {
-		if(element.hasChildNodes()) {
+		if (element.hasChildNodes()) {
 			element.insertBefore(newChild, element.getChildNodes().item(0));
 		} else {
 			element.appendChild(newChild);
@@ -136,24 +138,87 @@ public final class XMLUtil {
 	}
 
 	public static QName getQName(Node n) {
-		if(n.getLocalName() != null) {
+		if (n.getLocalName() != null) {
 			return new QName(n.getNamespaceURI(), n.getLocalName());
 		} else {
 			return new QName(n.getNamespaceURI(), n.getNodeName());
 		}
 	}
-	
+
 	public static void removeAllSubNodesExceptAttributes(Node n) {
-		NodeList children = n.getChildNodes();
-		List<Node> childrenToRemove = new ArrayList<Node>();
-		for (int i = 0; i < children.getLength(); i++) {
-			if (children.item(i).getNodeType() != Node.ATTRIBUTE_NODE) {
-				childrenToRemove.add(children.item(i));
+		NodeList childNodes = n.getChildNodes();
+		List<Node> childNodesToRemove = new ArrayList<Node>();
+
+		for (int i = 0; i < childNodes.getLength(); i++) {
+			Node c = childNodes.item(i);
+
+			if (c.getNodeType() != Node.ATTRIBUTE_NODE) {
+				childNodesToRemove.add(c);
 			}
 		}
-		
-		for(Node child : childrenToRemove) {
-			n.removeChild(child);
+
+		for (Node c : childNodesToRemove) {
+			n.removeChild(c);
 		}
+	}
+
+	public static Document createDocument() {
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		dbFactory.setNamespaceAware(true);
+		DocumentBuilder dBuilder;
+		try {
+			dBuilder = dbFactory.newDocumentBuilder();
+			return dBuilder.newDocument();
+		} catch (ParserConfigurationException e) {
+			throw new RuntimeException("Could not create XML document", e);
+		}
+	}
+
+	/**
+	 * 
+	 * @return one large string with the contents of all TextNodes, or null if
+	 *         there are non text nodes or no text nodes as children.
+	 */
+	public static String getContentsOfTextOnlyNode(Node n) {
+		NodeList children = n.getChildNodes();
+		if (children.getLength() == 0) {
+			return null;
+		}
+
+		StringBuffer sb = new StringBuffer();
+
+		for (int i = 0; i < children.getLength(); i++) {
+			Node node = children.item(i);
+			if (node.getNodeType() == Node.TEXT_NODE) {
+				sb.append(node.getNodeValue());
+			} else {
+				return null;
+			}
+		}
+
+		return sb.toString();
+	}
+
+	public static String getXPathForElement(Element e, NamespaceContext ctx) {
+		StringBuffer sb = new StringBuffer();
+		List<Node> path = new ArrayList<Node>();
+
+		Node currentNode = e;
+		while (currentNode.getParentNode() != currentNode.getOwnerDocument()) {
+			path.add(0, currentNode);
+			currentNode = currentNode.getParentNode();
+		}
+
+		for (Node n : path) {
+			sb.append("/");
+
+			String namespaceURI = n.getNamespaceURI();
+			if (namespaceURI != null && !namespaceURI.equals("")) {
+				sb.append(ctx.getPrefix(namespaceURI)).append(":");
+			}
+			sb.append(n.getLocalName());
+		}
+
+		return sb.toString();
 	}
 }

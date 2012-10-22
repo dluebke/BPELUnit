@@ -6,14 +6,18 @@ import net.bpelunit.model.bpel.IActivity;
 import net.bpelunit.model.bpel.IBpelObject;
 import net.bpelunit.model.bpel.ISource;
 import net.bpelunit.model.bpel.ITarget;
+import net.bpelunit.util.XMLUtil;
 
-import org.apache.xmlbeans.XmlObject;
 import org.oasisOpen.docs.wsbpel.x20.process.executable.TActivity;
+import org.oasisOpen.docs.wsbpel.x20.process.executable.TBoolean;
 import org.oasisOpen.docs.wsbpel.x20.process.executable.TExtensibleElements;
+import org.w3c.dom.Element;
 
 abstract class AbstractActivity<T extends TExtensibleElements> extends
 		AbstractBpelObject implements IActivity {
 
+	private static final String IMPL_POSTFIX = "Impl";
+	
 	T activity;
 
 	AbstractActivity(T a) {
@@ -51,7 +55,15 @@ abstract class AbstractActivity<T extends TExtensibleElements> extends
 		if (activity instanceof TActivity) {
 			((TActivity) activity).setSuppressJoinFailure(TBooleanHelper.convert(value));
 		} else {
-			throw new UnsupportedOperationException("Cannot set name for " + activity.getClass().getSimpleName());
+			throw new UnsupportedOperationException("Cannot set suppressJoinFailure for " + activity.getClass().getSimpleName());
+		}
+	}
+	
+	public boolean getSuppressJoinFailure() {
+		if (activity instanceof TActivity) {
+			return ((TActivity) activity).getSuppressJoinFailure().equals(TBoolean.YES);
+		} else {
+			throw new UnsupportedOperationException("Cannot get suppressJoinFailure for " + activity.getClass().getSimpleName());
 		}
 	}
 
@@ -60,12 +72,17 @@ abstract class AbstractActivity<T extends TExtensibleElements> extends
 	}
 
 	public String getActivityName() {
-		return activity.getClass().getSimpleName().substring(1);
+		String name = activity.getClass().getSimpleName().substring(1);
+		if(name.endsWith(IMPL_POSTFIX)) {
+			name = name.substring(0, name.length() - IMPL_POSTFIX.length());
+		}
+		
+		return name;
 	}
 
 	@Override
 	public String getXPathInDocument() {
-		return "//" + getActivityName() + "['" + getName() + "']";
+		return XMLUtil.getXPathForElement((Element)activity.getDomNode(), BpelFactory.INSTANCE.createNamespaceContext());
 	}
 
 	@Override
@@ -75,10 +92,5 @@ abstract class AbstractActivity<T extends TExtensibleElements> extends
 		} else {
 			return null;
 		}
-	}
-
-	@SuppressWarnings("unchecked")
-	protected void setNativeActivity(XmlObject newNativeActivity) {
-		this.activity = (T) newNativeActivity;
 	}
 }

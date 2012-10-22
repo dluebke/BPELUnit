@@ -5,6 +5,7 @@
 package net.bpelunit.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 import java.io.ByteArrayOutputStream;
@@ -159,6 +160,68 @@ public class XMLUtilTest {
 		assertEquals(new QName("", "simple"), XMLUtil.getQName(root));
 		assertEquals(new QName("", "b"), XMLUtil.getQName(doc.createElement("b")));
 		assertEquals(new QName("a", "b"), XMLUtil.getQName(doc.createElementNS("a", "b")));
+	}
+
+	@Test
+	public void testRemoveAllSubNodesExceptAttributes() throws Exception {
+		Document doc = XMLUtil.parseXML(getClass().getResourceAsStream(
+		"testRemoveAllSubNodesExceptAttributes.xml"));
+		Element root = doc.getDocumentElement();
+	
+		NodeList childNodes = root.getChildNodes();
+		assertEquals(5, childNodes.getLength());
+		assertEquals("a", root.getAttribute("a"));
+		assertEquals("b", root.getAttribute("b"));
+		
+		XMLUtil.removeAllSubNodesExceptAttributes(root);
+		
+		childNodes = root.getChildNodes();
+		assertEquals(0, childNodes.getLength());
+		assertEquals("a", root.getAttribute("a"));
+		assertEquals("b", root.getAttribute("b"));
+	}
+	
+	@Test
+	public void testGetContentsOfTextOnlyNodeOnlyTextNodes() throws Exception {
+		Document doc = XMLUtil.createDocument();
+		
+		Element e = doc.createElement("a");
+		doc.appendChild(e);
+		
+		e.appendChild(doc.createTextNode("a"));
+		e.appendChild(doc.createTextNode("b"));
+		e.appendChild(doc.createTextNode("c"));
+		
+		assertEquals("abc", XMLUtil.getContentsOfTextOnlyNode(e));
+	}
+	
+	@Test
+	public void testGetContentsOfTextOnlyNodeNotOnlyTextNodes() throws Exception {
+		Document doc = XMLUtil.createDocument();
+		
+		Element e = doc.createElement("a");
+		doc.appendChild(e);
+		
+		e.appendChild(doc.createTextNode("a"));
+		e.appendChild(doc.createElement("b"));
+		e.appendChild(doc.createTextNode("c"));
+		
+		assertNull(XMLUtil.getContentsOfTextOnlyNode(e));
+	}
+
+	@Test
+	public void testGetXPathForElement() throws Exception {
+		Document xml = XMLUtil.parseXML(getClass().getResourceAsStream("GetXPathForElement.xml"));
+		
+		SimpleNamespaceContext ctx = new SimpleNamespaceContext();
+		ctx.addNamespace("a", "a");
+		ctx.addNamespace("b", "b");
+		
+		Element a = xml.getDocumentElement();
+		Element b = (Element) XMLUtil.getChildElementsByName(a, "B").get(0);
+		Element c = (Element) XMLUtil.getChildElementsByName(b, "C").get(0);
+		
+		assertEquals("/b:B/a:C", XMLUtil.getXPathForElement(c, ctx));
 	}
 	
 	private static class NodeListMock implements NodeList {
