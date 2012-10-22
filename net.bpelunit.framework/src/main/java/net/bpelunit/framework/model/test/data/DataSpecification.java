@@ -95,6 +95,16 @@ public abstract class DataSpecification implements ITestArtefact {
 	}
 
 	public final void setStatus(ArtefactStatus fStatus) {
-		this.fStatus = fStatus;
+		setStatus(fStatus, HandleMode.EXECUTE);
+	}
+	
+	public final void setStatus(ArtefactStatus fStatus, HandleMode m) {
+		if(m == HandleMode.EXECUTE) {
+			this.fStatus = fStatus;
+		} else {
+			if(fStatus.hasProblems()) {
+				throw new CannotEvaluateException(null);
+			}
+		}
 	}
 }

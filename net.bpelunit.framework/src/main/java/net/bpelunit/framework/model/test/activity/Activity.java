@@ -105,7 +105,7 @@ public abstract class Activity implements ITestArtefact {
 
 	public abstract ITestArtefact getParent();
 
-	public abstract List<ITestArtefact> getChildren();
+	public abstract List<? extends ITestArtefact> getChildren();
 
 	public List<StateData> getStateData() {
 		return fStatus.getAsStateData();

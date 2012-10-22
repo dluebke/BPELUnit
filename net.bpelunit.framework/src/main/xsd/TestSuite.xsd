@@ -528,5 +528,16 @@ If false, all activities in the partner track will be skipped. Skipped tasks are
     	<xs:sequence></xs:sequence>
     	<xs:attribute name="name" type="xs:string"></xs:attribute>
     </xs:complexType>
+
+    <xs:complexType name="SubTrack">
+    	<xs:sequence>
+    		<xs:choice>
+    			<xs:element name="initiatingReceive" type="ReceiveActivity"></xs:element>
+    			<xs:element name="initiatingReceiveSend" type="TwoWayActivity"></xs:element>
+    			<xs:element name="initiatingReceiveSendAsync" type="TwoWayActivity"></xs:element>
+    		</xs:choice>
+			<xs:element name="track" type="Track"></xs:element>
+    	</xs:sequence>
+    </xs:complexType>
 </xs:schema>
 

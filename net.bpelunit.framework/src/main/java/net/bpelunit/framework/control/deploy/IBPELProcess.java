@@ -5,7 +5,6 @@ import java.io.InputStream;
 import javax.xml.namespace.QName;
 
 import net.bpelunit.framework.exception.DeploymentException;
-import net.bpelunit.model.bpel.IProcess;
 
 public interface IBPELProcess {
 
@@ -53,7 +52,7 @@ public interface IBPELProcess {
 	 * 
 	 * @return BPEL Model
 	 */
-	IProcess getProcessModel();
+	IBPELProcess getProcessModel();
 
 	/**
 	 * Adds a new partnerlink to the BPEL process. Changes are immediately

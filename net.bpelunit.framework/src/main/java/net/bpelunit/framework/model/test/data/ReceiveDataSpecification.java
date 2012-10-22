@@ -24,6 +24,7 @@ import net.bpelunit.framework.exception.SOAPEncodingException;
 import net.bpelunit.framework.exception.SpecificationException;
 import net.bpelunit.framework.model.test.activity.Activity;
 import net.bpelunit.framework.model.test.activity.ActivityContext;
+import net.bpelunit.framework.model.test.activity.IEvaluatable;
 import net.bpelunit.framework.model.test.activity.VelocityContextProvider;
 import net.bpelunit.framework.model.test.report.ArtefactStatus;
 import net.bpelunit.framework.model.test.report.ITestArtefact;
@@ -46,7 +47,7 @@ import org.w3c.dom.Element;
  * @author Philip Mayer, Antonio Garcia-Dominguez
  * 
  */
-public class ReceiveDataSpecification extends DataSpecification {
+public class ReceiveDataSpecification extends DataSpecification implements IEvaluatable {
 
 	/**
 	 * The actual SOAP operation used for the receive.
@@ -120,45 +121,56 @@ public class ReceiveDataSpecification extends DataSpecification {
 	 * @param incomingMessage
 	 */
 	public void handle(ActivityContext context, String incomingMessage) {
+		handle(context, incomingMessage, HandleMode.EXECUTE);
+	}
+	
+	void handle(ActivityContext context, String incomingMessage, HandleMode m) {
 
 		// Check content
-		setInWireFormat(incomingMessage);
+		setInWireFormat(incomingMessage, m);
 
 		if (hasProblems()) {
 			return;
 		}
 
 		try {
-			context.processHeaders(this);
+			if(m == HandleMode.EXECUTE) {
+				context.processHeaders(this);
+			}
+
+			if (hasProblems()) {
+				return;
+			}
 		} catch (HeaderProcessingException e) {
 			setStatus(ArtefactStatus.createErrorStatus("Header Processing Fault.", e));
 			return;
 		}
 
-		if (hasProblems()) {
-			return;
-		}
-
-		decodeMessage();
+		decodeMessage(m);
 
 		if (hasProblems()) {
 			return;
 		}
 
-		extractMappingData(context);
-
-		if (hasProblems()) {
-			return;
+		if(m == HandleMode.EXECUTE) {
+			extractMappingData(context, m);
+	
+			if (hasProblems()) {
+				return;
+			}
+			
+			context.saveReceivedMessage(fLiteralData);
 		}
 
-		context.saveReceivedMessage(fLiteralData);
-		validateConditions(context);
+		validateConditions(context, m);
 		if (hasProblems()) {
 			return;
 		}
 
 		// Receive completed.
-		setStatus(ArtefactStatus.createPassedStatus());
+		if(m == HandleMode.EXECUTE) {
+			setStatus(ArtefactStatus.createPassedStatus());
+		}
 	}
 
 	public SOAPMessage getSOAPMessage() {
@@ -167,25 +179,33 @@ public class ReceiveDataSpecification extends DataSpecification {
 
 	// ************************* Inner Stuff ***********************
 
-	private void setInWireFormat(String body) {
+	private void setInWireFormat(String body, HandleMode m) {
 		try {
 			fPlainMessage= body;
 			MessageFactory factory= MessageFactory.newInstance();
 			fSOAPMessage= factory.createMessage(null, new ByteArrayInputStream(body.getBytes()));
 		} catch (Exception e) {
-			setStatus(ArtefactStatus.createErrorStatus("Could not create SOAP message from incoming message: " + e.getMessage(), e));
+			if(m == HandleMode.EXECUTE) {
+				setStatus(ArtefactStatus.createErrorStatus("Could not create SOAP message from incoming message: " + e.getMessage(), e));
+			} else {
+				throw new CannotEvaluateException(e);
+			}
 		}
 	}
 
-	private void decodeMessage() {
+	private void decodeMessage(HandleMode m) {
 		try {
 			fLiteralData= fDecoder.deconstruct(fOperation, fSOAPMessage);
 		} catch (SOAPEncodingException e) {
-			setStatus(ArtefactStatus.createErrorStatus("Not able to deconstruct incoming message into SOAP Message: " + e.getMessage(), e));
+			if(m == HandleMode.EXECUTE) {
+				setStatus(ArtefactStatus.createErrorStatus("Not able to deconstruct incoming message into SOAP Message: " + e.getMessage(), e));
+			} else {
+				throw new CannotEvaluateException(e);
+			}
 		}
 	}
 
-	private void validateConditions(VelocityContextProvider templateContext) {
+	private void validateConditions(VelocityContextProvider templateContext, HandleMode m) {
 
 		// Check implicit fault assertions
 		SOAPBody body;
@@ -193,7 +213,7 @@ public class ReceiveDataSpecification extends DataSpecification {
 			body = fSOAPMessage.getSOAPBody();
 		} catch (SOAPException e) {
 			setStatus(ArtefactStatus.createErrorStatus(
-				"Exception during condition validation", e));
+				"Exception during condition validation", e), m);
 			return;
 		}
 		if (fOperation.isFault()) {
@@ -202,19 +222,19 @@ public class ReceiveDataSpecification extends DataSpecification {
 				setStatus(ArtefactStatus.createFailedStatus(
 					"A fault was expected in operation "
 					+ this
-					+ ", but none was found in input data."));
+					+ ", but none was found in input data."), m);
 				return;
 			}
 			if (fFaultCode != null && !fFaultCode.equals(fault.getFaultCodeAsQName())) {
 				setStatus(ArtefactStatus.createFailedStatus(String.format(
 					"Expected the fault code %s, got %s instead",
-					fFaultCode, fault.getFaultCodeAsQName())));
+					fFaultCode, fault.getFaultCodeAsQName())), m);
 				return;
 			}
 			if (fFaultString != null && !fFaultString.equals(fault.getFaultString())) {
 				setStatus(ArtefactStatus.createFailedStatus(String.format(
 					"Expected the fault string %s, got %s instead",
-					fFaultString, fault.getFaultString())));
+					fFaultString, fault.getFaultString())), m);
 				return;
 			}
 		}
@@ -222,7 +242,7 @@ public class ReceiveDataSpecification extends DataSpecification {
 			setStatus(ArtefactStatus.createFailedStatus(
 				"The operation "
 				+ this
-				+ " was expected to succeed, but replied with a SOAP fault."));
+				+ " was expected to succeed, but replied with a SOAP fault."), m);
 			return;
 		}
 
@@ -233,7 +253,7 @@ public class ReceiveDataSpecification extends DataSpecification {
 		} catch (Exception e) {
 			setStatus(ArtefactStatus.createFailedStatus(String.format(
 				"Could not create the Velocity context for this condition: %s",
-				e.getLocalizedMessage())));
+				e.getLocalizedMessage())), m);
 			return;
 		}
 		ContextXPathVariableResolver variableResolver = new ContextXPathVariableResolver(conditionContext);
@@ -246,13 +266,13 @@ public class ReceiveDataSpecification extends DataSpecification {
 				setStatus(ArtefactStatus.createFailedStatus(String.format(
 						"Condition '%s=%s' did not hold: %s",
 						c.getExpression(), c.getExpectedValue(), c.getStatus()
-								.getMessage())));
+								.getMessage())), m);
 				}
 			} else if (c.isError()) {
 				setStatus(ArtefactStatus.createErrorStatus(String.format(
 						"Condition '%s=%s' had an error: %s.", c
 								.getExpression(), c.getExpectedValue(), c
-								.getStatus().getMessage())));
+								.getStatus().getMessage())), m);
 			}
 		}
 	}
@@ -262,13 +282,13 @@ public class ReceiveDataSpecification extends DataSpecification {
 	 * context
 	 * 
 	 */
-	private void extractMappingData(ActivityContext context) {
+	private void extractMappingData(ActivityContext context, HandleMode m) {
 		List<DataCopyOperation> mapping= context.getMapping();
 		if (mapping != null) {
 			for (DataCopyOperation copy : mapping) {
 				copy.retrieveTextNodes(fLiteralData, getNamespaceContext());
 				if (copy.isError()) {
-					setStatus(ArtefactStatus.createErrorStatus("An error occurred while evaluating Copy-From-XPath expression."));
+					setStatus(ArtefactStatus.createErrorStatus("An error occurred while evaluating Copy-From-XPath expression."), m);
 					return;
 				}
 			}
@@ -323,4 +343,14 @@ public class ReceiveDataSpecification extends DataSpecification {
 		return stateData;
 	}
 
+	@Override
+	public boolean couldFinishSuccessfully(ActivityContext context,
+			String incomingMessage) {
+		try {
+			handle(context, incomingMessage, HandleMode.EVALUATE_ONLY);
+			return true;
+		} catch(CannotEvaluateException e) {
+			return false;
+		}
+	}
 }

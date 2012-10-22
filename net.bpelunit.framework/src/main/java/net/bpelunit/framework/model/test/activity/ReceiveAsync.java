@@ -33,7 +33,7 @@ import net.bpelunit.framework.model.test.wire.OutgoingMessage;
  * @author Philip Mayer
  * 
  */
-public class ReceiveAsync extends Activity {
+public class ReceiveAsync extends Activity implements IEvaluatable {
 
 	/**
 	 * The parent activity, if there is one.
@@ -78,7 +78,12 @@ public class ReceiveAsync extends Activity {
 			return;
 		}
 
-		fReceiveSpec.handle(context, incoming.getBody());
+		String message = incoming.getBody();
+		handle(context, message);
+	}
+
+	public void handle(ActivityContext context, String message) {
+		fReceiveSpec.handle(context, message);
 
 		/*
 		 * 
@@ -160,4 +165,8 @@ public class ReceiveAsync extends Activity {
 		return children;
 	}
 
+	@Override
+	public boolean couldFinishSuccessfully(ActivityContext context, String incoming) {
+		return fReceiveSpec.couldFinishSuccessfully(context, incoming);
+	}
 }

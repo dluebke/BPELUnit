@@ -31,7 +31,7 @@ import net.bpelunit.framework.model.test.wire.OutgoingMessage;
  * @author Philip Mayer
  * 
  */
-public class ReceiveSendSync extends TwoWaySyncActivity {
+public class ReceiveSendSync extends TwoWaySyncActivity implements IEvaluatable {
 
 
 	private static final int HTTP_OK = 200;
@@ -65,7 +65,14 @@ public class ReceiveSendSync extends TwoWaySyncActivity {
 			return;
 		}
 
-		getReceiveSpec().handle(context, incoming.getBody());
+		String message = incoming.getBody();
+		
+		handle(context, message);
+	}
+
+	@Override
+	public void handle(ActivityContext context, String message) {
+		getReceiveSpec().handle(context, message);
 
 		/*
 		 * This is the only place in the testing framework where we can (and should actually return
@@ -146,5 +153,11 @@ public class ReceiveSendSync extends TwoWaySyncActivity {
 		children.add(getSendSpec());
 
 		return children;
+	}
+	
+	@Override
+	public boolean couldFinishSuccessfully(ActivityContext context,
+			String incoming) {
+		return getReceiveSpec().couldFinishSuccessfully(context, incoming);
 	}
 }
