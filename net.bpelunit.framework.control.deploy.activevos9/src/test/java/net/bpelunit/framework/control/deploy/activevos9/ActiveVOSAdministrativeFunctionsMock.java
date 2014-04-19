@@ -374,6 +374,7 @@ public class ActiveVOSAdministrativeFunctionsMock extends
 			// TODO Auto-generated method stub
 			
 		}
+
 	}
 
 	private final class AeContributionManagementMock implements
