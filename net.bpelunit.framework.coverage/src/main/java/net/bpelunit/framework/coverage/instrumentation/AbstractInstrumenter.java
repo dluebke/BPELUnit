@@ -1,11 +1,17 @@
 package net.bpelunit.framework.coverage.instrumentation;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
 import net.bpelunit.framework.coverage.marker.Marker;
 import net.bpelunit.framework.coverage.marker.MarkerFactory;
+import net.bpelunit.framework.coverage.marker.MarkerInstanceList;
 import net.bpelunit.framework.coverage.result.IMetricCoverage;
 import net.bpelunit.model.bpel.IActivity;
+import net.bpelunit.model.bpel.IBpelObject;
 import net.bpelunit.model.bpel.IDocumentation;
 import net.bpelunit.model.bpel.IProcess;
 import net.bpelunit.model.bpel.IVisitor;
@@ -17,16 +23,23 @@ public abstract class AbstractInstrumenter implements IVisitor  {
 
 	static final QName QNAME_MARKER = new QName("http://www.bpelunit.net/instrumentation", "marker");
 	private MarkerFactory markerFactory;
+	private List<Marker> issuedMarkers = new ArrayList<Marker>();
 
-	public abstract String getMarkerPrefix();
+	public AbstractInstrumenter(MarkerFactory markerFactoryToUse) {
+		markerFactory = markerFactoryToUse;
+	}
 	
 	public void addCoverageMarkers(IProcess p) {
-		markerFactory = new MarkerFactory(getMarkerPrefix() + "_" + p.getName() + "_");
 		p.visit(this);
 	}
 	
 	protected Marker addCoverageMarker(IActivity a) {
-		Marker newMarker = markerFactory.createMarker();
+		return this.addCoverageMarker(a, a);
+	}
+	
+	protected Marker addCoverageMarker(IActivity a, IBpelObject measuredObject) {
+		Marker newMarker = markerFactory.createMarker(a, measuredObject);
+		issuedMarkers.add(newMarker);
 		
 		addCoverageMarker(a, newMarker);
 		
@@ -50,13 +63,21 @@ public abstract class AbstractInstrumenter implements IVisitor  {
 	}
 	
 	/**
-	 * Called when the framework detects the execution of a certain marker.
-	 * Might be called for markers that don't belong to this metric.
+	 * Calculates the coverage results for a given set of markers. The markers are selected and passed by the framework
+	 * and can be arbitrary subsets, e.g. based on test cases.
 	 * 
-	 * @param markerName
+	 * Markers can appear 0 to multiple times, depending on the execution count.
+	 * 
+	 * @param markers
+	 * @return
 	 */
-	public abstract void pushMarker(String markerName);
+	public abstract IMetricCoverage getCoverageResult(MarkerInstanceList markers);
 
-	public abstract IMetricCoverage getCoverageResult();
+	/**
+	 * @return a list of all markers that have been created/issued by this instrumenter.
+	 */
+	public List<Marker> getIssuedMarkers() {
+		return Collections.unmodifiableList(issuedMarkers);
+	}
 
 }

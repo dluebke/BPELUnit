@@ -1,14 +1,9 @@
 package net.bpelunit.framework.coverage.instrumentation.activity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import net.bpelunit.framework.coverage.instrumentation.AbstractInstrumenter;
-import net.bpelunit.framework.coverage.marker.Marker;
+import net.bpelunit.framework.coverage.marker.MarkerFactory;
+import net.bpelunit.framework.coverage.marker.MarkerInstanceList;
 import net.bpelunit.framework.coverage.result.IMetricCoverage;
-import net.bpelunit.model.bpel.IActivity;
 import net.bpelunit.model.bpel.IAssign;
 import net.bpelunit.model.bpel.ICatch;
 import net.bpelunit.model.bpel.ICatchAll;
@@ -47,57 +42,35 @@ import net.bpelunit.model.bpel.IWhile;
 
 public class ActivityCoverageInstrumenter extends AbstractInstrumenter {
 
-	private Map<String, IActivity> markerMapping = new HashMap<String, IActivity>();
-	private Map<String, Integer> markerCounter = new HashMap<String, Integer>();
-	private List<String> markers = new ArrayList<String>();
-	
-	@Override
-	public String getMarkerPrefix()	{
-		return "ACTIVITY_MARKER";
+	public ActivityCoverageInstrumenter(MarkerFactory markerFactoryToUse) {
+		super(markerFactoryToUse);
 	}
 	
 	@Override
-	public void pushMarker(String markerName) {
-		Integer markerCount = markerCounter.get(markerName);
-		if(markerCount != null) {
-			markerCount++;
-			markerCounter.put(markerName, markerCount);
-		}
+	public IMetricCoverage getCoverageResult(MarkerInstanceList markerInstances) {
+		return new ActivityMetricCoverage(markerInstances, getIssuedMarkers());
 	}
 
-	@Override
-	public IMetricCoverage getCoverageResult() {
-		return new ActivityMetricCoverage(markers, markerMapping, markerCounter);
-	}
-	
-	private void instrumentActivity(IActivity a) {
-		Marker newMarker = addCoverageMarker(a);
-		
-		markerMapping.put(newMarker.getName(), a);
-		markerCounter.put(newMarker.getName(), 0);
-		markers.add(newMarker.getName());
-	}
-	
 	/*---- Visitor Functions ----*/
-	
+
 	public void visit(IAssign a) {
-		instrumentActivity(a);
+		addCoverageMarker(a);
 	}
 
 	public void visit(ICompensate a) {
-		instrumentActivity(a);
+		addCoverageMarker(a);
 	}
 
 	public void visit(ICompensateScope a) {
-		instrumentActivity(a);
+		addCoverageMarker(a);
 	}
 
 	public void visit(IEmpty a) {
-		instrumentActivity(a);		
+		addCoverageMarker(a);
 	}
 
 	public void visit(IExit a) {
-		instrumentActivity(a);		
+		addCoverageMarker(a);
 	}
 
 	public void visit(IFlow a) {
@@ -105,71 +78,71 @@ public class ActivityCoverageInstrumenter extends AbstractInstrumenter {
 	}
 
 	public void visit(IForEach a) {
-		// Structured Activity		
+		// Structured Activity
 	}
 
 	public void visit(IIf a) {
-		// Structured Activity		
+		// Structured Activity
 	}
 
 	public void visit(IInvoke a) {
-		instrumentActivity(a);		
+		addCoverageMarker(a);
 	}
 
 	public void visit(IPick a) {
-		// Structured Activity		
+		// Structured Activity
 	}
 
 	public void visit(IProcess a) {
-		// Structured Activity		
+		// Structured Activity
 	}
 
 	public void visit(IReceive a) {
-		instrumentActivity(a);		
+		addCoverageMarker(a);
 	}
 
 	public void visit(IRepeatUntil a) {
-		// Structured Activity		
+		// Structured Activity
 	}
 
 	public void visit(IReply a) {
-		instrumentActivity(a);		
+		addCoverageMarker(a);
 	}
 
 	public void visit(IRethrow a) {
-		instrumentActivity(a);		
+		addCoverageMarker(a);
 	}
 
 	public void visit(IScope a) {
-		// Structured Activity		
+		// Structured Activity
 	}
 
 	public void visit(ISequence a) {
-		// Structured Activity		
+		// Structured Activity
 	}
 
 	public void visit(IThrow a) {
-		instrumentActivity(a);		
+		addCoverageMarker(a);
 	}
 
 	public void visit(IValidate a) {
-		instrumentActivity(a);		
+		addCoverageMarker(a);
 	}
 
 	public void visit(IWait a) {
-		instrumentActivity(a);		
+		addCoverageMarker(a);
 	}
 
 	public void visit(IWhile a) {
-		// Structured Activity		
+		// Structured Activity
 	}
 
 	public void visit(IOnAlarm a) {
-		// Structured Activity	
+		// Structured Activity
 	}
 
 	public void visit(IOnMessage a) {
-		// Structured Activity	
+		// Structured Activity
 	}
 
 	public void visit(ICopy c) {
@@ -193,31 +166,31 @@ public class ActivityCoverageInstrumenter extends AbstractInstrumenter {
 	}
 
 	public void visit(IOnMessageHandler onMessageHandler) {
-		// uninteresting		
+		// uninteresting
 	}
 
 	public void visit(IElseIf elseIf) {
-		// uninteresting		
+		// uninteresting
 	}
 
 	public void visit(IElse else1) {
-		// uninteresting		
+		// uninteresting
 	}
 
 	public void visit(ILink link) {
-		// uninteresting		
+		// uninteresting
 	}
 
 	public void visit(ICatch ccatch) {
-		// uninteresting		
+		// uninteresting
 	}
 
 	public void visit(ICatchAll catchAll) {
-		// uninteresting		
+		// uninteresting
 	}
 
 	public void visit(IOnAlarmEventHandler onAlarmEventHandler) {
 		// uninteresting
-		
+
 	}
 }

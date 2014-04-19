@@ -1,14 +1,9 @@
 package net.bpelunit.framework.coverage.instrumentation.handler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import net.bpelunit.framework.coverage.instrumentation.AbstractInstrumenter;
-import net.bpelunit.framework.coverage.marker.Marker;
+import net.bpelunit.framework.coverage.marker.MarkerFactory;
+import net.bpelunit.framework.coverage.marker.MarkerInstanceList;
 import net.bpelunit.framework.coverage.result.IMetricCoverage;
-import net.bpelunit.model.bpel.IActivity;
 import net.bpelunit.model.bpel.IAssign;
 import net.bpelunit.model.bpel.ICatch;
 import net.bpelunit.model.bpel.ICatchAll;
@@ -47,9 +42,9 @@ import net.bpelunit.model.bpel.IWhile;
 
 public class HandlerCoverageInstrumenter extends AbstractInstrumenter {
 
-	private Map<String, IActivity> markerMapping = new HashMap<String, IActivity>();
-	private Map<String, Integer> markerCounter = new HashMap<String, Integer>();
-	private List<String> markers = new ArrayList<String>();
+	public HandlerCoverageInstrumenter(MarkerFactory markerFactoryToUse) {
+		super(markerFactoryToUse);
+	}
 	
 	public void visit(IAssign a) {
 	}
@@ -142,11 +137,11 @@ public class HandlerCoverageInstrumenter extends AbstractInstrumenter {
 	}
 	
 	public void visit(ICompensationHandler compensationHandler) {
-		instrumentActivity(compensationHandler.getMainActivity(), compensationHandler.getXPathInDocument());
+		addCoverageMarker(compensationHandler.getMainActivity(), compensationHandler);
 	}
 
 	public void visit(IOnMessageHandler onMessageHandler) {
-		instrumentActivity(onMessageHandler.getScope().getMainActivity(), onMessageHandler);
+		addCoverageMarker(onMessageHandler.getScope().getMainActivity(), onMessageHandler);
 	}
 
 	public void visit(ICatch ccatch) {
@@ -159,31 +154,9 @@ public class HandlerCoverageInstrumenter extends AbstractInstrumenter {
 	}
 	
 	@Override
-	public String getMarkerPrefix() {
-		return "HANDLER_COVERAGE";
-	}
-
-	@Override
-	public void pushMarker(String markerName) {
-		Integer markerCount = markerCounter.get(markerName);
-		if(markerCount != null) {
-			markerCount++;
-			markerCounter.put(markerName, markerCount);
-		}
-	}
-
-	@Override
-	public IMetricCoverage getCoverageResult() {
+	public IMetricCoverage getCoverageResult(MarkerInstanceList markers) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-	
-	private void instrumentActivity(IActivity activityToInstrument, IActivity activityToMeasure) {
-		Marker newMarker = addCoverageMarker(activityToInstrument);
-		
-		markerMapping.put(newMarker.getName(), activityToMeasure);
-		markerCounter.put(newMarker.getName(), 0);
-		markers.add(newMarker.getName());
 	}
 
 }

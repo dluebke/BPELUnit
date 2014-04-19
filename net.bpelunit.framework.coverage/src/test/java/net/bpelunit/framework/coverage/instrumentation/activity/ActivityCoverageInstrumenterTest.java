@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import net.bpelunit.framework.coverage.marker.MarkerFactory;
 import net.bpelunit.model.bpel.BpelFactory;
 import net.bpelunit.model.bpel.IEmpty;
 import net.bpelunit.model.bpel.IProcess;
@@ -16,7 +17,8 @@ import org.w3c.dom.Node;
 
 public class ActivityCoverageInstrumenterTest {
 
-	private ActivityCoverageInstrumenter instrumenter = new ActivityCoverageInstrumenter();
+	private final MarkerFactory mf = new MarkerFactory();
+	private ActivityCoverageInstrumenter instrumenter = new ActivityCoverageInstrumenter(mf);
 	
 	@Test
 	public void testInstrumentation() throws Exception {

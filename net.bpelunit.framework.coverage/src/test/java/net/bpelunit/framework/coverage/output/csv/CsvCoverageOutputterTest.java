@@ -39,11 +39,11 @@ public class CsvCoverageOutputterTest {
 		
 		String actualContents = new String(FileUtil.readFile(files[0]));
 		String expectedContents = new String(FileUtil.readFile(new File("src/test/resources/csvoutputter/testOutput.Metric1.csv")));
-		assertEquals(expectedContents, actualContents);
+		assertEquals(expectedContents.replaceAll("\r\n", "\n"), actualContents.replaceAll("\r\n", "\n"));
 		
 		actualContents = new String(FileUtil.readFile(files[1]));
 		expectedContents = new String(FileUtil.readFile(new File("src/test/resources/csvoutputter/testOutput.Metric2.csv")));
-		assertEquals(expectedContents, actualContents);
+		assertEquals(expectedContents.replaceAll("\r\n", "\n"), actualContents.replaceAll("\r\n", "\n"));
 	}
 	
 	private void initializeOutputDirectory(String testName) throws IOException {
@@ -53,7 +53,7 @@ public class CsvCoverageOutputterTest {
 			FileUtils.deleteDirectory(outputDirectory);
 		}
 		outputDirectory.mkdirs();
-		doc = new CoverageDocument(new File(outputDirectory, "suite.bpts"));		
+		doc = new CoverageDocument(new File(outputDirectory, "suite.bpts"), null);		
 	}
 
 	@Test
@@ -72,11 +72,11 @@ public class CsvCoverageOutputterTest {
 		
 		String actualContents = new String(FileUtil.readFile(files[0]));
 		String expectedContents = new String(FileUtil.readFile(new File("src/test/resources/csvoutputter/testOutputWithSeparator-Metric1.csv")));
-		assertEquals(expectedContents, actualContents);
+		assertEquals(expectedContents.replaceAll("\r\n", "\n"), actualContents.replaceAll("\r\n", "\n"));
 		
 		actualContents = new String(FileUtil.readFile(files[1]));
 		expectedContents = new String(FileUtil.readFile(new File("src/test/resources/csvoutputter/testOutputWithSeparator-Metric2.csv")));
-		assertEquals(expectedContents, actualContents);
+		assertEquals(expectedContents.replaceAll("\r\n", "\n"), actualContents.replaceAll("\r\n", "\n"));
 	}
 	
 }

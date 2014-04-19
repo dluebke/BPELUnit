@@ -9,9 +9,10 @@ public class CoverageDocument implements ICoverageDocument {
 	private File suite;
 	private List<IBPELCoverage> coverageInformation = new ArrayList<IBPELCoverage>();
 
-	public CoverageDocument(File suite) {
+	public CoverageDocument(File suite, List<IBPELCoverage> coverageInformation) {
 		super();
 		this.suite = suite;
+		this.coverageInformation.addAll(coverageInformation);
 	}
 
 	public File getExecutedSuite() {

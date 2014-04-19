@@ -3,9 +3,12 @@ package net.bpelunit.framework.coverage.instrumentation.activity;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
+import net.bpelunit.framework.coverage.marker.Marker;
+import net.bpelunit.framework.coverage.marker.MarkerFactory;
+import net.bpelunit.framework.coverage.marker.MarkerInstance;
+import net.bpelunit.framework.coverage.marker.MarkerInstanceList;
 import net.bpelunit.framework.coverage.result.ICoverageResult;
 import net.bpelunit.model.bpel.IActivity;
 
@@ -15,20 +18,18 @@ import org.junit.Test;
 
 public class ActivityMetricCoverageTest {
 
-	private HashMap<String, IActivity> markerMapping = new HashMap<String, IActivity>();
-	private HashMap<String, Integer> markerCounter = new HashMap<String, Integer>();
-	private List<String> markers = new ArrayList<String>();
+	private MarkerInstanceList markers = new MarkerInstanceList();
+	private List<Marker> allMarkers = new ArrayList<Marker>();
+	private MarkerFactory markerFactory = new MarkerFactory();
 	
 	@Before
 	public void setUp() {
-		markerMapping.clear();
-		markerCounter.clear();
 		markers.clear();
 	}
 	
 	@Test
 	public void testMetaData() throws Exception {
-		ActivityMetricCoverage amc = new ActivityMetricCoverage(markers, markerMapping, markerCounter);
+		ActivityMetricCoverage amc = new ActivityMetricCoverage(markers, allMarkers);
 		assertEquals("ACTIVITY", amc.getMetricId());
 		assertEquals("Activity Coverage", amc.getMetricName());
 	}
@@ -36,7 +37,7 @@ public class ActivityMetricCoverageTest {
 	@Test
 	public void testOneActivityTypeOneActivity() throws Exception {
 		addActivityEntry("A1", "assign", 10);
-		ActivityMetricCoverage amc = new ActivityMetricCoverage(markers, markerMapping, markerCounter);
+		ActivityMetricCoverage amc = new ActivityMetricCoverage(markers, allMarkers);
 		
 		List<ICoverageResult> result = amc.getCoverageResult();
 		assertEquals(3, result.size());
@@ -67,7 +68,7 @@ public class ActivityMetricCoverageTest {
 	public void testOneActivityTypeTwoActivities() throws Exception {
 		addActivityEntry("A1", "assign", 10);
 		addActivityEntry("A2", "assign", 1);
-		ActivityMetricCoverage amc = new ActivityMetricCoverage(markers, markerMapping, markerCounter);
+		ActivityMetricCoverage amc = new ActivityMetricCoverage(markers, allMarkers);
 		
 		List<ICoverageResult> result = amc.getCoverageResult();
 		assertEquals(4, result.size());
@@ -111,7 +112,7 @@ public class ActivityMetricCoverageTest {
 		addActivityEntry("A1", "assign", 10);
 		addActivityEntry("A2", "assign", 1);
 		addActivityEntry("E2", "empty", 2);
-		ActivityMetricCoverage amc = new ActivityMetricCoverage(markers, markerMapping, markerCounter);
+		ActivityMetricCoverage amc = new ActivityMetricCoverage(markers, allMarkers);
 		
 		List<ICoverageResult> result = amc.getCoverageResult();
 		assertEquals(7, result.size());
@@ -171,7 +172,7 @@ public class ActivityMetricCoverageTest {
 		addActivityEntry("A1", "assign", 10);
 		addActivityEntry("A2", "assign", 0);
 		addActivityEntry("E2", "empty", 0);
-		ActivityMetricCoverage amc = new ActivityMetricCoverage(markers, markerMapping, markerCounter);
+		ActivityMetricCoverage amc = new ActivityMetricCoverage(markers, allMarkers);
 		
 		List<ICoverageResult> result = amc.getCoverageResult();
 		assertEquals(7, result.size());
@@ -207,10 +208,12 @@ public class ActivityMetricCoverageTest {
 	
 	private void addActivityEntry(String activityName, String activityType, int counter) {
 		IActivity a = new DummyActivity(activityName, activityType);
-		String marker = activityName;
-		markers.add(marker);
-		markerMapping.put(marker, a);
-		markerCounter.put(marker, counter);
+		Marker marker = markerFactory.createMarker(a, a);
+		allMarkers.add(marker);
+		
+		for(int i = 0; i < counter; i++) {
+			markers.add(new MarkerInstance(marker, "TC1"));
+		}
 	}
 	
 	@Test
@@ -221,7 +224,7 @@ public class ActivityMetricCoverageTest {
 		addActivityEntry("A2", "assign", 0);
 		addActivityEntry("Reply", "reply", 1);
 		
-		ActivityMetricCoverage amc = new ActivityMetricCoverage(markers, markerMapping, markerCounter);
+		ActivityMetricCoverage amc = new ActivityMetricCoverage(markers, allMarkers);
 		
 		List<ICoverageResult> result = amc.getCoverageResult();
 		assertEquals(8, result.size());
@@ -284,7 +287,7 @@ public class ActivityMetricCoverageTest {
 		addActivityEntry("A2", "assign", 1);
 		addActivityEntry("Reply", "reply", 2);
 		
-		ActivityMetricCoverage amc = new ActivityMetricCoverage(markers, markerMapping, markerCounter);
+		ActivityMetricCoverage amc = new ActivityMetricCoverage(markers, allMarkers);
 		
 		List<ICoverageResult> result = amc.getCoverageResult();
 		assertEquals(8, result.size());

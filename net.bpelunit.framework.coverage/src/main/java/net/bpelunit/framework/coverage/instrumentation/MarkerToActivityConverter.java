@@ -1,14 +1,11 @@
 package net.bpelunit.framework.coverage.instrumentation;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.bpelunit.framework.control.deploy.IBPELProcess;
 import net.bpelunit.framework.coverage.CoverageConstants;
-import net.bpelunit.framework.coverage.service.MarkerService;
 import net.bpelunit.framework.exception.DeploymentException;
 import net.bpelunit.framework.execution.IBPELUnitContext;
-import net.bpelunit.framework.execution.ITestLifeCycleElement;
 import net.bpelunit.model.bpel.IActivity;
 import net.bpelunit.model.bpel.IActivityContainer;
 import net.bpelunit.model.bpel.IAssign;
@@ -19,6 +16,7 @@ import net.bpelunit.model.bpel.IInvoke;
 import net.bpelunit.model.bpel.IScope;
 import net.bpelunit.model.bpel.ISequence;
 import net.bpelunit.model.bpel.IVariable;
+import net.bpelunit.model.bpel.visitor.BasicActivitiesCollector;
 import net.bpelunit.util.XMLUtil;
 
 import org.w3c.dom.Document;
@@ -32,15 +30,18 @@ public class MarkerToActivityConverter {
 
 		for (IBPELProcess process : context.getDeployment().getBPELProcesses()) {
 			addWsdlToProcess(process);
-			addPartnerlinkToProcess(process, context);
-
+			addPartnerlinkToProcess(process, context.getURLForService(CoverageConstants.COVERAGE_SERVICE_BPELUNIT_NAME).toExternalForm());
+			BasicActivitiesCollector bac = new BasicActivitiesCollector();
+			process.getProcessModel().visit(bac);
+			
+			for(IActivity a : bac.getBasicActivities()) {
+				createScopeForMarkers(a);
+			}
 		}
 	}
 
 	private void addPartnerlinkToProcess(IBPELProcess process,
-			IBPELUnitContext context) {
-		MarkerService markerService = new MarkerService(
-				filterInstrumenters(context.getElementsInPrepareProcesses()));
+			String coverageServiceEndpoint) {
 		process.addPartnerlink(
 				CoverageConstants.MARKER_SERVICE_PARTNERLINK,
 				CoverageConstants.COVERAGE_PARTNERLINK_TYPE,
@@ -49,21 +50,7 @@ public class MarkerToActivityConverter {
 				CoverageConstants.MARKER_SERVICE_PARTNERLINK_PARTNERROLE,
 				CoverageConstants.COVERAGE_SERVICE_SERVICE,
 				CoverageConstants.COVERAGE_SERVICE_PORT,
-				context.addService(
-						CoverageConstants.COVERAGE_SERVICE_BPELUNIT_NAME,
-						markerService).toExternalForm());
-	}
-
-	private List<? extends AbstractInstrumenter> filterInstrumenters(
-			List<? extends ITestLifeCycleElement> elementsInPrepareProcesses) {
-
-		List<AbstractInstrumenter> result = new ArrayList<AbstractInstrumenter>();
-		for (ITestLifeCycleElement e : elementsInPrepareProcesses) {
-			if (e instanceof AbstractInstrumenter) {
-				result.add((AbstractInstrumenter) e);
-			}
-		}
-		return result;
+				coverageServiceEndpoint);
 	}
 
 	private void addWsdlToProcess(IBPELProcess p) throws DeploymentException {
@@ -105,16 +92,19 @@ public class MarkerToActivityConverter {
 		invoke.setOperation(CoverageConstants.COVERAGE_SERVICE_MARK_OPERATION);
 		invoke.setPartnerLink(CoverageConstants.MARKER_SERVICE_PARTNERLINK);
 
-		if (startsInstance(a)) {
-			sequence.moveBefore(assign, a);
+		if (!startsInstance(a)) {
 			sequence.moveBefore(invoke, a);
+			sequence.moveBefore(assign, invoke);
 		}
 		return scope;
 	}
 
 	private boolean startsInstance(IActivity a) {
-		return !(a instanceof ICreateInstance)
-				|| !((ICreateInstance) a).isCreateInstance();
+		if((a instanceof ICreateInstance)) {
+			return ((ICreateInstance) a).isCreateInstance();
+		} else {
+			return false;
+		}
 	}
 
 	Element buildCoverageMarkerMessage(Element msgElement, IActivity a) {

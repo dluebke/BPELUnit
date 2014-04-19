@@ -1,14 +1,9 @@
 package net.bpelunit.framework.coverage.instrumentation.branch;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import net.bpelunit.framework.coverage.instrumentation.AbstractInstrumenter;
-import net.bpelunit.framework.coverage.marker.Marker;
+import net.bpelunit.framework.coverage.marker.MarkerFactory;
+import net.bpelunit.framework.coverage.marker.MarkerInstanceList;
 import net.bpelunit.framework.coverage.result.IMetricCoverage;
-import net.bpelunit.model.bpel.IActivity;
 import net.bpelunit.model.bpel.IAssign;
 import net.bpelunit.model.bpel.ICatch;
 import net.bpelunit.model.bpel.ICatchAll;
@@ -47,36 +42,12 @@ import net.bpelunit.model.bpel.IWhile;
 
 public class BranchCoverageInstrumenter extends AbstractInstrumenter {
 
-	
-	private Map<String, String> markerMapping = new HashMap<String, String>();
-	private Map<String, Integer> markerCounter = new HashMap<String, Integer>();
-	private List<String> markers = new ArrayList<String>();
-	
-	@Override
-	public String getMarkerPrefix()	{
-		return "BRANCH_MARKER";
+	public BranchCoverageInstrumenter(MarkerFactory markerFactoryToUse) {
+		super(markerFactoryToUse);
 	}
 	
-	@Override
-	public void pushMarker(String markerName) {
-		Integer markerCount = markerCounter.get(markerName);
-		if(markerCount != null) {
-			markerCount++;
-			markerCounter.put(markerName, markerCount);
-		}
-	}
-
-	@Override
-	public IMetricCoverage getCoverageResult() {
-		return new BranchMetricCoverage(markers, markerMapping, markerCounter);
-	}
-	
-	private void instrumentActivity(IActivity a, String xpathToBranch) {
-		Marker newMarker = addCoverageMarker(a);
-		
-		markerMapping.put(newMarker.getName(), xpathToBranch);
-		markerCounter.put(newMarker.getName(), 0);
-		markers.add(newMarker.getName());
+	public IMetricCoverage getCoverageResult(MarkerInstanceList markers) {
+		return new BranchMetricCoverage(markers);
 	}
 	
 	/*---- Visitor Functions ----*/
@@ -100,19 +71,21 @@ public class BranchCoverageInstrumenter extends AbstractInstrumenter {
 	}
 
 	public void visit(IForEach a) {
-		instrumentActivity(a.getScope(), a.getXPathInDocument());
+		addCoverageMarker(a.getScope(), a);
 	}
 
 	public void visit(IIf a) {
-		instrumentActivity(a.getMainActivity(), a.getXPathInDocument());
+		addCoverageMarker(a.getMainActivity());
+		
 		for(IElseIf i : a.getElseIfs()) {
-			instrumentActivity(i.getMainActivity(), i.getXPathInDocument());
+			addCoverageMarker(i.getMainActivity(), i);
 		}
+		
 		if(a.getElse() == null) {
 			IElse e = a.setNewElse();
 			e.setNewEmpty();
 		}
-		instrumentActivity(a.getElse().getMainActivity(), a.getElse().getXPathInDocument());
+		addCoverageMarker(a.getElse().getMainActivity(), a.getElse());
 	}
 
 	public void visit(IInvoke a) {

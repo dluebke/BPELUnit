@@ -49,7 +49,7 @@ public class HtmlCoverageOutputterTest {
 			FileUtils.deleteDirectory(outputDirectory);
 		}
 		outputDirectory.mkdirs();
-		doc = new CoverageDocument(new File(outputDirectory, "suite.bpts"));		
+		doc = new CoverageDocument(new File(outputDirectory, "suite.bpts"), null);		
 	}
 
 	@Test

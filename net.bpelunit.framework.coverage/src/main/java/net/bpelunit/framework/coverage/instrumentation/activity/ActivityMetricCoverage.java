@@ -2,8 +2,9 @@ package net.bpelunit.framework.coverage.instrumentation.activity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import net.bpelunit.framework.coverage.marker.Marker;
+import net.bpelunit.framework.coverage.marker.MarkerInstanceList;
 import net.bpelunit.framework.coverage.result.ICoverageResult;
 import net.bpelunit.framework.coverage.result.IMetricCoverage;
 import net.bpelunit.model.bpel.ActivityType;
@@ -14,11 +15,9 @@ public class ActivityMetricCoverage implements IMetricCoverage {
 	private List<ActivityCoverageResult> results = new ArrayList<ActivityCoverageResult>();
 	private List<ActivityCoverageResult> basicActivityResults = new ArrayList<ActivityCoverageResult>();
 
-	public ActivityMetricCoverage(List<String> markers,
-			Map<String, ? extends IActivity> markerMapping,
-			Map<String, Integer> markerCounter) {
+	public ActivityMetricCoverage(MarkerInstanceList markerInstances, List<Marker> allMarkers) {
 
-		createActivityEntries(markers, markerMapping, markerCounter);
+		createActivityEntries(markerInstances, allMarkers);
 		createActivityTypeEntries();
 
 		createOverallEntry();
@@ -75,12 +74,10 @@ public class ActivityMetricCoverage implements IMetricCoverage {
 		}
 	}
 
-	private void createActivityEntries(List<String> markers,
-			Map<String, ? extends IActivity> markerMapping,
-			Map<String, Integer> markerCounter) {
-		for (String marker : markers) {
-			IActivity a = markerMapping.get(marker);
-			int counter = markerCounter.get(marker);
+	private void createActivityEntries(MarkerInstanceList markerInstances, List<Marker> allMarkers) {
+		for (Marker marker : allMarkers) {
+			IActivity a = (IActivity)marker.getMeasuredObject();
+			int counter = markerInstances.getMarkerInstancessForMeasuredObject(a).size();
 
 			double coverage = Math.min(counter, 1.0);
 			ActivityCoverageResult activityCoverageResult = new ActivityCoverageResult(

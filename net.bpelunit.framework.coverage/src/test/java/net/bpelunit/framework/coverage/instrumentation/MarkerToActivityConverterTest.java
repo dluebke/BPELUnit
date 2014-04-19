@@ -6,10 +6,10 @@ import static org.junit.Assert.assertTrue;
 import net.bpelunit.framework.coverage.marker.Marker;
 import net.bpelunit.framework.coverage.marker.MarkerFactory;
 import net.bpelunit.model.bpel.BpelFactory;
-import net.bpelunit.model.bpel.IActivity;
 import net.bpelunit.model.bpel.IAssign;
 import net.bpelunit.model.bpel.IInvoke;
 import net.bpelunit.model.bpel.IProcess;
+import net.bpelunit.model.bpel.IReceive;
 import net.bpelunit.model.bpel.IScope;
 import net.bpelunit.model.bpel.ISequence;
 import net.bpelunit.util.XMLUtil;
@@ -24,7 +24,7 @@ import org.w3c.dom.NodeList;
 public class MarkerToActivityConverterTest {
 
 	private IProcess p;
-	private IActivity activity;
+	private IReceive activity;
 	private final MarkerFactory mf = new MarkerFactory("TEST");
 	private MarkerToActivityConverter markerToActivityConverter;
 	private Marker marker1;
@@ -35,7 +35,7 @@ public class MarkerToActivityConverterTest {
 	@Before
 	public void setUp() {
 		p = BpelFactory.createProcess();
-		activity = p.setNewEmpty();
+		activity = p.setNewReceive();
 		activity.setName("ActivityToInstrument");
 		
 		markerToActivityConverter = new MarkerToActivityConverter();
@@ -43,9 +43,9 @@ public class MarkerToActivityConverterTest {
 		markerMsg = xmlDoc.createElement("e");
 		xmlDoc.appendChild(markerMsg);
 		
-		marker1 = mf.createMarker();
-		marker2 = mf.createMarker();
-		marker3 = mf.createMarker();
+		marker1 = mf.createMarker(activity, activity);
+		marker2 = mf.createMarker(activity, activity);
+		marker3 = mf.createMarker(activity, activity);
 	}
 	
 	@Test
@@ -75,8 +75,9 @@ public class MarkerToActivityConverterTest {
 	}
 	
 	@Test
-	public void testCreateScopeForMarkers() throws Exception {
+	public void testCreateScopeForMarkersForNonStartingActivity() throws Exception {
 		addThreeMarkersToActivity();
+		activity.setCreateInstance(false);
 		
 		markerToActivityConverter.createScopeForMarkers(activity);
 		
@@ -87,9 +88,21 @@ public class MarkerToActivityConverterTest {
 		assertTrue(seq.getActivities().get(0) instanceof IAssign);
 		assertTrue(seq.getActivities().get(1) instanceof IInvoke);
 		assertSame(activity, seq.getActivities().get(2));
+	}
+	
+	@Test
+	public void testCreateScopeForMarkersForStartingActivity() throws Exception {
+		addThreeMarkersToActivity();
+		activity.setCreateInstance(true);
 		
-//		ByteArrayOutputStream actualXMLAsStream = new ByteArrayOutputStream();
-//		p.save(actualXMLAsStream);
-//		System.out.println(new String(actualXMLAsStream.toByteArray()));
+		markerToActivityConverter.createScopeForMarkers(activity);
+		
+		IScope scope = (IScope)p.getMainActivity();
+		assertEquals("__BPELUNIT_MARK_REQUEST__", scope.getVariables().get(0).getName());
+		
+		ISequence seq = (ISequence)scope.getMainActivity();
+		assertSame(activity, seq.getActivities().get(0));
+		assertTrue(seq.getActivities().get(1) instanceof IAssign);
+		assertTrue(seq.getActivities().get(2) instanceof IInvoke);
 	}
 }
