@@ -76,7 +76,7 @@ public class ActiveVOS9DeploymentTest {
 	@Test
 	public void testDeploymentWithOneProcess() throws Exception {
 		deployment = new ActiveVOS9Deployment(new File(TEST_RESOURCE_DIR
-				+ "bpelunit-tc1.bpr"));
+				+ "bpelunit-tc1.bpr"), null);
 
 		XPathTool xpath = deployment.createXPathToolForPdd();
 
@@ -149,7 +149,7 @@ public class ActiveVOS9DeploymentTest {
 	@Test
 	@Ignore
 	public void testAddFilesToProcess() throws Exception {
-		deployment = new ActiveVOS9Deployment(new File("src/test/resources/simplebpel.bpr"));
+		deployment = new ActiveVOS9Deployment(new File("src/test/resources/simplebpel.bpr"), null);
 		
 		List<IBPELProcess> processes = deployment.getBPELProcesses();
 		assertEquals(1, processes.size());
@@ -177,7 +177,7 @@ public class ActiveVOS9DeploymentTest {
 		assertTrue(lastImport.getLocation().endsWith("coverage.wsdl"));
 		assertEquals(IImport.IMPORTTYPE_WSDL, lastImport.getImportType());
 		
-		WsdlEntryType[] wsdlsInCatalog = deployment.catalogDoc.getCatalog().getWsdlEntryArray();
+		WsdlEntryType[] wsdlsInCatalog = deployment.getCatalogDoc().getCatalog().getWsdlEntryArray();
 		WsdlEntryType lastWsdl = wsdlsInCatalog[wsdlsInCatalog.length - 1];
 		assertEquals("project:/com.innoq.simplebpel/wsdl/bpelunit/coverage.wsdl", lastWsdl.getLocation());
 		assertTrue(lastWsdl.getClasspath().endsWith("coverage.wsdl"));

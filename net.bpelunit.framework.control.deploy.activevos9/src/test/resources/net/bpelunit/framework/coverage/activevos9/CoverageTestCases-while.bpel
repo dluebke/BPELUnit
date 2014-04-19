@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpel:process xmlns:CoverageTestCases="http://tests.bpelunit.net/CoverageTestCases/" xmlns:aei="http://www.activebpel.org/2009/02/bpel/extension/ignorable" xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:ext="http://www.activebpel.org/2006/09/bpel/extension/query_handling" xmlns:ext1="http://www.activebpel.org/2009/06/bpel/extension/links" xmlns:xsd="http://www.w3.org/2001/XMLSchema" aei:editStyle="BPMN" ext1:linksAreTransitions="yes" ext:createTargetXPath="yes" ext:disableSelectionFailure="yes" name="CoverageTestCases-while_1" suppressJoinFailure="yes" targetNamespace="http://tests.bpelunit.net">
+   <bpmndi:BPMNDiagram xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" aei:bpelDigest="" aei:editStyle="BPMN" aei:layoutNeeded="false" aei:modelVersion="4" aei:objectId="138939280472108559" aei:processInitiatorSim="" isHorizontal="false" xmlns:aei="http://www.activebpel.org/2009/02/bpel/extension/ignorable" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI">
+      <bpmndi:BPMNPlane>
+         <bpmndi:BPMNShape aei:backgroundImageLocation="icons/bpmn/activity/ActivityBlock.png" aei:objectId="138939286674809261" aei:type="PARTNER_LINK" aei:visible="false,false,false,false,false," bpmnElement="138939286674809261"/>
+         <bpmndi:BPMNShape aei:absoluteLocation="LOC {66,80}" aei:absoluteSize="DIM {178,203}" aei:objectId="138939282653109225" aei:type="SEQUENCE" bpmnElement="138939282653109225" isHorizontal="false">
+            <dc:Bounds height="-1" width="-1" x="56" y="70"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape aei:absoluteLocation="LOC {120,90}" aei:absoluteSize="DIM {70,60}" aei:attachments="" aei:name="Receive" aei:objectId="138939282492609221" aei:principal="" aei:type="RECEIVE" bpmnElement="138939282492609221">
+            <dc:Bounds height="-1" width="-1" x="66" y="80"/>
+            <bpmndi:BPMNLabel aei:absoluteLocation="LOC {102,147}" aei:absoluteSize="DIM {38,13}" aei:anchor.location="1" aei:anchor.objectId="138939282492609221" aei:backgroundColor="RGB {255,255,255}" aei:objectId="138939282492609223" aei:relative.location="LOC {-19,47}" aei:text="Receive" bpmnElement="138939282492609221label">
+               <dc:Bounds height="-1" width="-1" x="0" y="0"/>
+            </bpmndi:BPMNLabel>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape aei:absoluteLocation="LOC {76,175}" aei:absoluteSize="DIM {158,98}" aei:objectId="138939283279009233" aei:type="WHILE" aei:whileCondition="$Counter &lt; number( $OneWayWithInt/in )" aei:whileConditionLang="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0" bpmnElement="138939283279009233" isHorizontal="false">
+            <dc:Bounds height="-1" width="-1" x="0" y="0"/>
+            <bpmndi:BPMNLabel aei:absoluteLocation="LOC {175,268}" aei:absoluteSize="DIM {26,13}" aei:anchor.location="11" aei:anchor.objectId="138939283279009233" aei:backgroundColor="RGB {255,255,255}" aei:objectId="138939283279009235" aei:relative.location="LOC {0,-6}" aei:text="While" bpmnElement="138939283279009233label">
+               <dc:Bounds height="-1" width="-1" x="0" y="0"/>
+            </bpmndi:BPMNLabel>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape aei:absoluteLocation="LOC {94,189}" aei:absoluteSize="DIM {125,53}" aei:objectId="138939284281409245" aei:type="ASSIGN" bpmnElement="138939284281409245">
+            <dc:Bounds height="-1" width="-1" x="13" y="9"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape aei:fromExpression="$Counter+1" aei:fromType="3" aei:objectId="138939290931609281" aei:toVariable="Counter" aei:type="ASSIGN_COPY" bpmnElement="138939290931609281"/>
+         <bpmndi:BPMNShape aei:absoluteLocation="LOC {84,179}" aei:absoluteSize="DIM {145,73}" aei:actySimState="0" aei:bpelName="" aei:joinConditionComp="" aei:objectId="138939284378009247" aei:type="Sequence" bpmnElement="138939284281409245wrappingSequence" isHorizontal="false">
+            <dc:Bounds height="-1" width="-1" x="3" y="-1"/>
+         </bpmndi:BPMNShape>
+      </bpmndi:BPMNPlane>
+   </bpmndi:BPMNDiagram>
+   <bpel:extensions>
+      <bpel:extension mustUnderstand="no" namespace="http://www.activebpel.org/2009/02/bpel/extension/ignorable"/>
+      <bpel:extension mustUnderstand="no" namespace="http://www.omg.org/spec/BPMN/20100524/DI"/>
+      <bpel:extension mustUnderstand="yes" namespace="http://www.activebpel.org/2006/09/bpel/extension/query_handling"/>
+      <bpel:extension mustUnderstand="yes" namespace="http://www.activebpel.org/2009/06/bpel/extension/links"/>
+   </bpel:extensions>
+   <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="../wsdl/CoverageTestCases.wsdl" namespace="http://tests.bpelunit.net/CoverageTestCases/"/>
+   <bpel:partnerLinks>
+      <bpel:partnerLink aei:id="138939286674809261" myRole="Process" name="CoverageTestCases" partnerLinkType="CoverageTestCases:CoverageTestCasesPLT"/>
+   </bpel:partnerLinks>
+   <bpel:variables>
+      <bpel:variable name="Counter" type="xsd:int">
+         <bpel:from>
+            <bpel:literal>0</bpel:literal>
+         </bpel:from>
+      </bpel:variable>
+      <bpel:variable element="CoverageTestCases:OneWayWithInt" name="OneWayWithInt"/>
+   </bpel:variables>
+   <bpel:sequence aei:id="138939282653109225">
+      <bpel:receive aei:id="138939282492609221" createInstance="yes" name="Receive" operation="OneWayWithInt" partnerLink="CoverageTestCases" variable="OneWayWithInt"/>
+      <bpel:while aei:id="138939283279009233">
+         <bpel:condition>$Counter &lt; number( $OneWayWithInt/in )</bpel:condition>
+         <bpel:assign aei:id="138939284281409245">
+            <bpel:copy aei:id="138939290931609281">
+               <bpel:from>$Counter+1</bpel:from>
+               <bpel:to variable="Counter"/>
+            </bpel:copy>
+         </bpel:assign>
+      </bpel:while>
+   </bpel:sequence>
+</bpel:process>

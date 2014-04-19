@@ -2,7 +2,7 @@
  * This file belongs to the BPELUnit utility and Eclipse plugin set. See enclosed
  * license file for more information.
  */
-package net.bpelunit.framework.control.deploy.activevos9;
+package net.bpelunit.activevos9;
 
 import static org.junit.Assert.*;
 
@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.ws.BindingProvider;
+
+import net.bpelunit.activevos9.ActiveVOSAdministrativeFunctions;
 
 import org.junit.Test;
 
@@ -44,7 +46,7 @@ public class ActiveVOSAdministrativeFunctionsTest {
 		
 		assertEquals("user", ap.getRequestContext().get(BindingProvider.USERNAME_PROPERTY));
 		assertEquals("pwd", ap.getRequestContext().get(BindingProvider.PASSWORD_PROPERTY));
-		assertEquals("http://localhost:8081/active-bpel/services/ActiveBpelDeployBPR", ap.getRequestContext().get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY));
+		assertEquals("http://localhost:8081/active-bpel/services/ActiveBpelAdmin", ap.getRequestContext().get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY));
 		
 		assertEquals("user", cp.getRequestContext().get(BindingProvider.USERNAME_PROPERTY));
 		assertEquals("pwd", cp.getRequestContext().get(BindingProvider.PASSWORD_PROPERTY));
@@ -57,7 +59,7 @@ public class ActiveVOSAdministrativeFunctionsTest {
 		
 		assertEquals("user", ap.getRequestContext().get(BindingProvider.USERNAME_PROPERTY));
 		assertEquals("pwd", ap.getRequestContext().get(BindingProvider.PASSWORD_PROPERTY));
-		assertEquals("http://localhost:8081/active-bpel/services/ActiveBpelDeployBPR", ap.getRequestContext().get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY));
+		assertEquals("http://localhost:8081/active-bpel/services/ActiveBpelAdmin", ap.getRequestContext().get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY));
 		
 		assertEquals("user", cp.getRequestContext().get(BindingProvider.USERNAME_PROPERTY));
 		assertEquals("pwd", cp.getRequestContext().get(BindingProvider.PASSWORD_PROPERTY));

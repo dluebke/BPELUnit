@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,6 +20,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpressionException;
 
 import net.bpelunit.framework.control.deploy.AbstractDeployment;
 import net.bpelunit.framework.control.deploy.IBPELProcess;
@@ -26,6 +28,7 @@ import net.bpelunit.framework.control.soap.NamespaceContextImpl;
 import net.bpelunit.framework.control.util.XPathTool;
 import net.bpelunit.framework.exception.DeploymentException;
 import net.bpelunit.model.bpel.BpelFactory;
+import net.bpelunit.model.bpel.IPartnerLink;
 import net.bpelunit.model.bpel.IProcess;
 import net.bpelunit.util.FileUtil;
 import net.bpelunit.util.XMLUtil;
@@ -50,6 +53,7 @@ public class ActiveVOS9Deployment extends AbstractDeployment {
 	final class BPELInfo implements IBPELProcess {
 
 		private static final String PATH_TO_BPELUNIT_ADDED_FILES = "wsdl/bpelunit/";
+		private static final String NAMESPACE_WSA = "http://www.w3.org/2005/08/addressing";
 
 		BPELInfo(File bpelFile, File pddFile, Document pdd)
 				throws IOException, JAXBException {
@@ -91,7 +95,7 @@ public class ActiveVOS9Deployment extends AbstractDeployment {
 			// newImport.setLocation(calculateRelativePathTo(wsdlFileName));
 			// newImport.setNamespace(namespace);
 
-			String catalogLocation = catalogDoc.getCatalog().getURI() + "/"
+			String catalogLocation = getCatalogDoc().getCatalog().getURI() + "/"
 					+ PATH_TO_BPELUNIT_ADDED_FILES + wsdlFileName;
 			addFileToExplodedBPR(wsdlFileName, contents);
 			addCatalogEntryIfNecessary(catalogLocation, classpath);
@@ -136,7 +140,7 @@ public class ActiveVOS9Deployment extends AbstractDeployment {
 		private void addCatalogEntryIfNecessary(String location,
 				String classpath) {
 			boolean found = false;
-			for (WsdlEntryType w : catalogDoc.getCatalog().getWsdlEntryArray()) {
+			for (WsdlEntryType w : getCatalogDoc().getCatalog().getWsdlEntryArray()) {
 				if (location.equals(w.getLocation())) {
 					found = true;
 					break;
@@ -144,7 +148,7 @@ public class ActiveVOS9Deployment extends AbstractDeployment {
 			}
 
 			if (!found) {
-				WsdlEntryType wsdlEntry = catalogDoc.getCatalog()
+				WsdlEntryType wsdlEntry = getCatalogDoc().getCatalog()
 						.addNewWsdlEntry();
 				wsdlEntry.setClasspath(classpath);
 				wsdlEntry.setLocation(location);
@@ -174,10 +178,70 @@ public class ActiveVOS9Deployment extends AbstractDeployment {
 				String partnerRole, QName partnerService, String partnerPort,
 				String partnerEndpointURL) {
 
-			getPddXml(); // use this in order to set changed flags correctly
-			getProcessModel();
+			addPartnerLinkToBPEL(name, partnerlinkType, processRole, partnerRole);
 
-			return null; // TODO
+			addPartnerLinkToPDD(name, processRole, processEndpointSuffix,
+					partnerRole, partnerService, partnerPort,
+					partnerEndpointURL);
+			
+			try {
+				return new URL(activeBpelEndpointURL + processEndpointSuffix);
+			} catch (MalformedURLException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		private void addPartnerLinkToPDD(String name, String processRole,
+				String processEndpointSuffix, String partnerRole,
+				QName partnerService, String partnerPort,
+				String partnerEndpointURL) {
+			Document pddXml = getPddXml(); // use this in order to set changed flags correctly
+			XPathTool xpathForPdd = createXPathToolForPdd();
+			try {
+				List<Node> partnerLinks = xpathForPdd.evaluateAsList("//pdd:partnerLinks", pddXml);
+				Element partnerLinksElement = (Element)partnerLinks.get(0);
+				Element newPDDPartnerLinkElement = pddXml.createElementNS(NAMESPACE_PDD, "partnerLink");
+				newPDDPartnerLinkElement.setAttribute("name", name);
+				
+				if(processRole != null) {
+					Element myRoleElement = pddXml.createElementNS(NAMESPACE_PDD, "myRole");
+					myRoleElement.setAttribute("allowedRoles", "");
+					myRoleElement.setAttribute("binding", "MSG");
+					myRoleElement.setAttribute("service", processEndpointSuffix);
+					newPDDPartnerLinkElement.appendChild(myRoleElement);
+				}
+				if(partnerRole != null) {
+					Element partnerRoleElement = pddXml.createElementNS(NAMESPACE_PDD, "partnerRole");
+					partnerRoleElement.setAttribute("endpointReference", "static");
+					partnerRoleElement.setAttribute("invokeHandler", "default:Address");
+					Element wsaEndpointReferenceElement = pddXml.createElementNS(NAMESPACE_WSA, "EndpointReference");
+					Element wsaAddressElement = pddXml.createElementNS(NAMESPACE_WSA, "Address");
+					wsaAddressElement.setTextContent(partnerEndpointURL);
+					Element wsaMetaDataElement = pddXml.createElementNS(NAMESPACE_WSA, "Metadata");
+					wsaEndpointReferenceElement.appendChild(wsaMetaDataElement);
+					Element wsaServiceNameElement = pddXml.createElementNS(NAMESPACE_WSA, "ServiceName");
+					wsaServiceNameElement.setAttribute("PortName", partnerPort);
+					wsaServiceNameElement.setAttribute("xmlns:service", partnerService.getNamespaceURI());
+					wsaServiceNameElement.setTextContent("service:" + partnerService.getLocalPart());
+					wsaMetaDataElement.appendChild(wsaServiceNameElement);
+					wsaEndpointReferenceElement.appendChild(wsaAddressElement);
+					partnerRoleElement.appendChild(wsaEndpointReferenceElement);
+					newPDDPartnerLinkElement.appendChild(partnerRoleElement);
+				}
+				
+				partnerLinksElement.appendChild(newPDDPartnerLinkElement);
+			} catch (XPathExpressionException e) {
+				
+			}
+		}
+
+		private void addPartnerLinkToBPEL(String name, QName partnerlinkType,
+				String processRole, String partnerRole) {
+			IPartnerLink newPartnerLink = getProcessModel().addPartnerLink();
+			newPartnerLink.setName(name);
+			newPartnerLink.setMyRole(processRole);
+			newPartnerLink.setPartnerRole(partnerRole);
+			newPartnerLink.setPartnerLinkType(partnerlinkType);
 		}
 
 		@Override
@@ -232,18 +296,20 @@ public class ActiveVOS9Deployment extends AbstractDeployment {
 	private File bpr;
 	private File tempDirectory = null;
 	private File tempBPR = null;
-	CatalogDocument catalogDoc = null;
+	private CatalogDocument catalogDoc = null;
 
 	private List<BPELInfo> allProcesses = new ArrayList<BPELInfo>();
+	private String activeBpelEndpointURL;
 	public static final String NAMESPACE_PDD = "http://schemas.active-endpoints.com/pdd/2006/08/pdd.xsd";
 
-	public ActiveVOS9Deployment(File bpr) throws DeploymentException {
+	public ActiveVOS9Deployment(File bpr, String activeBpelEndpointURLWithTrailingSlash) throws DeploymentException {
 		if (!bpr.isFile() || !bpr.canRead()) {
 			throw new DeploymentException(
 					"The given BPR does not exist or cannot be read:"
 							+ bpr.getAbsolutePath());
 		}
 
+		this.activeBpelEndpointURL = activeBpelEndpointURLWithTrailingSlash;
 		this.bpr = bpr;
 	}
 
@@ -273,7 +339,7 @@ public class ActiveVOS9Deployment extends AbstractDeployment {
 					bpel.writeOut();
 				}
 
-				catalogDoc.save(new File(tempDirectory, CATALOG_FILENAME));
+				getCatalogDoc().save(new File(tempDirectory, CATALOG_FILENAME));
 
 				// repackage
 				tempBPR = File.createTempFile(bpr.getName(), ".bpr");
@@ -379,7 +445,7 @@ public class ActiveVOS9Deployment extends AbstractDeployment {
 
 	XPathTool createXPathToolForPdd() {
 		NamespaceContextImpl nsc = new NamespaceContextImpl();
-		nsc.setNamespace("pdd", ActiveVOS9Deployment.NAMESPACE_PDD);
+		nsc.setNamespace("pdd", NAMESPACE_PDD);
 		nsc.setNamespace("wsa", "http://www.w3.org/2005/08/addressing");
 
 		XPathTool xpath = new XPathTool(nsc);
@@ -387,4 +453,7 @@ public class ActiveVOS9Deployment extends AbstractDeployment {
 		return xpath;
 	}
 
+	CatalogDocument getCatalogDoc() {
+		return catalogDoc;
+	}
 }

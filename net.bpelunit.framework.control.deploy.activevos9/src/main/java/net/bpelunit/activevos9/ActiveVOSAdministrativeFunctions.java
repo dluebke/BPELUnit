@@ -2,11 +2,12 @@
  * This file belongs to the BPELUnit utility and Eclipse plugin set. See enclosed
  * license file for more information.
  */
-package net.bpelunit.framework.control.deploy.activevos9;
+package net.bpelunit.activevos9;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -14,8 +15,10 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.ws.BindingProvider;
 
+import net.bpelunit.util.JAXBUtil;
 import net.bpelunit.util.XMLUtil;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -28,16 +31,21 @@ import com.active_endpoints.docs.wsdl.engineapi._2010._05.enginemanagement.Admin
 import com.active_endpoints.docs.wsdl.engineapi._2010._05.enginemanagement.ContributionManagementService;
 import com.active_endpoints.docs.wsdl.engineapi._2010._05.enginemanagement.IAeContributionManagement;
 import com.active_endpoints.schemas.activebpeladmin._2007._01.activebpeladmin.AesDeployBprType;
+import com.active_endpoints.schemas.activebpeladmin._2007._01.activebpeladmin.AesProcessFilter;
+import com.active_endpoints.schemas.activebpeladmin._2007._01.activebpeladmin.AesProcessFilterType;
+import com.active_endpoints.schemas.activebpeladmin._2007._01.activebpeladmin.AesProcessInstanceDetail;
+import com.active_endpoints.schemas.activebpeladmin._2007._01.activebpeladmin.AesProcessListType;
+import com.active_endpoints.schemas.activebpeladmin._2007._01.activebpeladmin.AesProcessType;
 import com.active_endpoints.schemas.activebpeladmin._2007._01.activebpeladmin.AesStringResponseType;
 import com.active_endpoints.schemas.engineapi._2010._05.engineapitypes.AesContribution;
 import com.active_endpoints.schemas.engineapi._2010._05.engineapitypes.AesContributionListResult;
 import com.active_endpoints.schemas.engineapi._2010._05.engineapitypes.AesContributionSearchFilter;
 import com.active_endpoints.schemas.engineapi._2010._05.enginemanagementtypes.AesDeleteContributionType;
 
-class ActiveVOSAdministrativeFunctions {
+public class ActiveVOSAdministrativeFunctions {
 
 	@SuppressWarnings("serial")
-	class DeployException extends Exception {
+	public class DeployException extends Exception {
 		public DeployException(String message, Throwable t) {
 			super(message, t);
 		}
@@ -54,12 +62,13 @@ class ActiveVOSAdministrativeFunctions {
 			"http://docs.active-endpoints.com/wsdl/engineapi/2010/05/EngineManagement.wsdl",
 			"ContributionManagementService");
 
-	private static final String ACTIVE_BPEL_ADMIN_WSDL_RESOURCE = "/ActiveBpelDeployBPR.wsdl";
+	private static final String ACTIVE_BPEL_ADMIN_WSDL_RESOURCE = "/ActiveBpelAdmin.wsdl";
 	private static final String CONTRIBUTION_MANAGEMENT_SERVICE_WSDL_RESOURCE = "/AeContributionManagement.wsdl";
 	
 	private static final String ATTRIBUTE_ERROR_COUNT = "numErrors";
-	private static final String ENDPOINT_PATH_ACTIVE_BPEL_ADMIN_SERVICE = "/ActiveBpelDeployBPR";
+	private static final String ENDPOINT_PATH_ACTIVE_BPEL_ADMIN_SERVICE = "/ActiveBpelAdmin";
 	private static final String ENDPOINT_PATH_CONTRIBUTION_MANAGEMENT_SERVICE = "/AeContributionManagement";
+	private static final String ENDPOINT_PATH_ACTIVE_BPEL_DEPLOY_SERVICE = "/ActiveBpelDeployBPR";
 	
 	private String baseEndpoint;
 	
@@ -77,6 +86,8 @@ class ActiveVOSAdministrativeFunctions {
 	private void calculateBaseEndpoint(String endpoint) {
 		if(endpoint.endsWith(ENDPOINT_PATH_ACTIVE_BPEL_ADMIN_SERVICE)) {
 			baseEndpoint = endpoint.substring(0, endpoint.length() - ENDPOINT_PATH_ACTIVE_BPEL_ADMIN_SERVICE.length() + 1);
+		} else if(endpoint.endsWith(ENDPOINT_PATH_ACTIVE_BPEL_DEPLOY_SERVICE)) {
+			baseEndpoint = endpoint.substring(0, endpoint.length() - ENDPOINT_PATH_ACTIVE_BPEL_DEPLOY_SERVICE.length() + 1);
 		} else {
 			baseEndpoint = endpoint;
 		}
@@ -104,7 +115,7 @@ class ActiveVOSAdministrativeFunctions {
 						.getResource(ACTIVE_BPEL_ADMIN_WSDL_RESOURCE),
 				ACTIVE_BPEL_ADMIN_SERVICE_NAME);
 
-		activeBpelAdminPort = activeBpelAdmin.getActiveBpelAdminPort();
+		activeBpelAdminPort = activeBpelAdmin.getActiveBpelAdmin();
 		setBasicAuthenticationForBindingProvider(activeBpelAdminPort, username,
 				password);
 		setEndpointForBindingProvider(activeBpelAdminPort, endpoint);
@@ -164,7 +175,7 @@ class ActiveVOSAdministrativeFunctions {
 		AesStringResponseType deployBpr;
 		
 		deployBprInput.setBprFilename(bprFileName);
-		deployBprInput.setBase64File(contents);
+		deployBprInput.setBase64File(new String(Base64.encodeBase64(contents)));
 		deployBpr = getActiveBpelAdminPort().deployBpr(deployBprInput);
 
 		String responseMessage = deployBpr.getResponse();
@@ -179,7 +190,7 @@ class ActiveVOSAdministrativeFunctions {
 		} catch (ParserConfigurationException e) {
 			throw new DeployException("Internal error: " + e.getMessage(), e);
 		} catch (SAXException e) {
-			throw new DeployException("Internal reading response XML: " + e.getMessage(), e);
+			throw new DeployException("Internal error while reading response XML: " + e.getMessage(), e);
 		} catch (IOException e) {
 			throw new DeployException(e.getMessage(), e);
 		} 
@@ -189,6 +200,28 @@ class ActiveVOSAdministrativeFunctions {
 		// TODO Auto-generated method stub
 	}
 	
+	public List<AesProcessInstanceDetail> getProcessInstancesStartedBetween(Date from, Date till) {
+		AesProcessFilter filter = new AesProcessFilter();
+		filter.setProcessCreateStart(JAXBUtil.convertToXMLDateTime(from));
+		filter.setProcessCreateEnd(JAXBUtil.convertToXMLDateTime(till));
+		AesProcessFilterType input = new AesProcessFilterType();
+		input.setFilter(filter);
+		AesProcessListType processList = activeBpelAdminPort.getProcessList(input);
+		return processList.getResponse().getRowDetails().getItem();
+	}
+	
+	public String getLogForProcessInstance(long pid) {
+		AesProcessType input = new AesProcessType();
+		input.setPid(pid);
+		AesStringResponseType processLog = activeBpelAdminPort.getProcessLog(input);
+		return processLog.getResponse();
+	}
+	
+
+	public String getActiveBPELURL() {
+		return baseEndpoint + "/";
+	}
+	
 	//=================================
 	// Accessors for testing only
 	//=================================
@@ -196,14 +229,15 @@ class ActiveVOSAdministrativeFunctions {
 	/**
 	 * For testing only
 	 */
-	IAeAxisActiveBpelAdmin getActiveBpelAdminPort() {
+	protected IAeAxisActiveBpelAdmin getActiveBpelAdminPort() {
 		return activeBpelAdminPort;
 	}
 
 	/**
 	 * For testing only
 	 */
-	IAeContributionManagement getContributionManagementPort() {
+	protected IAeContributionManagement getContributionManagementPort() {
 		return contributionManagementPort;
 	}
+
 }

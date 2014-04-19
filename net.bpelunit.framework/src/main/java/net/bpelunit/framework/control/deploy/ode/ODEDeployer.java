@@ -203,7 +203,7 @@ public class ODEDeployer implements IBPELDeployer {
 	}
 
 	@Override
-	public IDeployment getDeployment(ProcessUnderTest processUnderTest)
+	public IDeployment getDeployment(String bptsDirectory)
 			throws DeploymentException {
 		// TODO Auto-generated method stub
 		return null;

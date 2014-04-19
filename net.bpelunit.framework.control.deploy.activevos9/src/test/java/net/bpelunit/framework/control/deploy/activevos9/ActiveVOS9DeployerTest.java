@@ -18,6 +18,7 @@ import net.bpelunit.framework.exception.DeploymentException;
 import net.bpelunit.framework.model.ProcessUnderTest;
 import net.bpelunit.util.FileUtil;
 
+import org.apache.commons.codec.binary.Base64;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -115,7 +116,7 @@ public class ActiveVOS9DeployerTest {
 		assertEquals("deployBpr", methodCall.methodName);
 		byte[] bprContents = FileUtil.readFile(new File(BPR_FILENAME));
 		AesDeployBprType aesDeployBprType = (AesDeployBprType) methodCall.parameters[0];
-		assertArrayEquals(bprContents, aesDeployBprType.getBase64File());
+		assertArrayEquals(bprContents, Base64.decodeBase64(aesDeployBprType.getBase64File().getBytes()));
 		assertEquals("bpelunit-tc1.bpr", aesDeployBprType.getBprFilename());
 	}
 

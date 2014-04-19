@@ -123,6 +123,6 @@ public interface IBPELDeployer {
 	 * @return
 	 * @throws DeploymentException
 	 */
-	IDeployment getDeployment(ProcessUnderTest processUnderTest)
+	IDeployment getDeployment(String bptsDirectory)
 			throws DeploymentException;
 }

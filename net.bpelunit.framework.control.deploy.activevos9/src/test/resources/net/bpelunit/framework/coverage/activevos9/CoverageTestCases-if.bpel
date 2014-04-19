@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpel:process xmlns:CoverageTestCases="http://tests.bpelunit.net/CoverageTestCases/" xmlns:aei="http://www.activebpel.org/2009/02/bpel/extension/ignorable" xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:ext="http://www.activebpel.org/2006/09/bpel/extension/query_handling" xmlns:ext1="http://www.activebpel.org/2009/06/bpel/extension/links" xmlns:ns="http://tests.bpelunit.net/coveragetestcases_1/public" xmlns:xsd="http://www.w3.org/2001/XMLSchema" aei:editStyle="BPMN" ext1:linksAreTransitions="yes" ext:createTargetXPath="yes" ext:disableSelectionFailure="yes" name="CoverageTestCases_1" suppressJoinFailure="yes" targetNamespace="http://tests.bpelunit.net">
+   <bpmndi:BPMNDiagram xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" aei:editStyle="BPMN" aei:layoutNeeded="false" aei:modelVersion="4" aei:objectId="138938392589001499" aei:processInitiatorSim="" isHorizontal="true" xmlns:aei="http://www.activebpel.org/2009/02/bpel/extension/ignorable" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI">
+      <bpmndi:BPMNPlane>
+         <bpmndi:BPMNShape aei:backgroundImageLocation="icons/bpmn/activity/ActivityBlock.png" aei:objectId="138938407533002021" aei:type="PARTNER_LINK" aei:visible="false,false,false,false,false," bpmnElement="138938407533002021"/>
+         <bpmndi:BPMNShape aei:objectId="138938395784201961" aei:type="SEQUENCE" bpmnElement="138938395784201961" isHorizontal="true">
+            <dc:Bounds height="267" width="579" x="5" y="5"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape aei:attachments="" aei:name="Receive" aei:objectId="138938395704901957" aei:principal="" aei:type="RECEIVE" bpmnElement="138938395704901957">
+            <dc:Bounds height="60" width="70" x="101" y="157"/>
+            <bpmndi:BPMNLabel aei:anchor.location="1" aei:anchor.objectId="138938395704901957" aei:backgroundColor="RGB {255,255,255}" aei:objectId="138938395704901959" aei:relative.location="LOC {-19,47}" aei:text="Receive" bpmnElement="138938395704901957label">
+               <dc:Bounds height="13" width="38" x="0" y="0"/>
+            </bpmndi:BPMNLabel>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape aei:objectId="138938396191301967" aei:type="IF" bpmnElement="138938396191301967" isHorizontal="true">
+            <dc:Bounds height="247" width="314" x="0" y="0"/>
+            <bpmndi:BPMNLabel aei:anchor.location="4" aei:anchor.objectId="138938396191301967" aei:backgroundColor="RGB {255,255,255}" aei:objectId="138938396191401969" aei:relative.location="LOC {6,-18}" aei:text="If" bpmnElement="138938396191301967label">
+               <dc:Bounds height="13" width="8" x="0" y="0"/>
+            </bpmndi:BPMNLabel>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape aei:IF_EXPRESSION="$OneWayWithInt/in = '1'" aei:IF_EXPR_LANG="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0" aei:objectId="138938396191401971" aei:text="i = 1" aei:type="ELSE_IF" bpmnElement="138938396191301967ifDef">
+            <dc:Bounds height="111" width="184" x="0" y="0"/>
+            <bpmndi:BPMNLabel aei:anchor.location="4" aei:anchor.objectId="138938396191401971" aei:backgroundColor="RGB {255,255,255}" aei:objectId="138938396191501973" aei:relative.location="LOC {-28,-13}" aei:text="i = 1" bpmnElement="138938396191301967ifDeflabel">
+               <dc:Bounds height="13" width="56" x="0" y="0"/>
+            </bpmndi:BPMNLabel>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape aei:absoluteLocation="LOC {0,0}" aei:absoluteSize="DIM {-1,-1}" aei:backgroundColor="RGB {226,226,226}" aei:backgroundImageLocation="icons/bpmn/activity/ActivityBlock.png" aei:borderColor="RGB {0,0,255}" aei:bpmNotation="EmptyTask" aei:collapsed="false" aei:drawBorder="false" aei:font="${system.default}" aei:fontColor="RGB {0,0,0}" aei:imageDisplay="true" aei:imageTextGap="4" aei:joinCondition="" aei:joinConditionLang="" aei:name="Empty1" aei:objectId="138938397340801995" aei:scaleImage="false" aei:sizeToFit="true" aei:text="" aei:textAlignment="1" aei:textFormat="1" aei:textPlacement="16" aei:transparent="true" aei:type="NONE_EVENT" bpmnElement="138938397340801995">
+            <dc:Bounds height="-1" width="-1" x="0" y="0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape aei:actySimState="0" aei:bpelName="" aei:joinConditionComp="" aei:objectId="138938396191501975" aei:type="Sequence" bpmnElement="138938397340801995wrappingSequence" isHorizontal="true">
+            <dc:Bounds height="78" width="150" x="0" y="0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape aei:IF_EXPRESSION="$OneWayWithInt/in = '2'" aei:IF_EXPR_LANG="" aei:objectId="138938807096806433" aei:text="i = 2" aei:type="ELSE_IF" bpmnElement="138938807096806433">
+            <dc:Bounds height="-1" width="-1" x="0" y="0"/>
+            <bpmndi:BPMNLabel aei:anchor.location="4" aei:anchor.objectId="138938807096806433" aei:backgroundColor="RGB {255,255,255}" aei:objectId="138938807096806435" aei:relative.location="LOC {-28,-13}" aei:text="i = 2" bpmnElement="138938807096806433label">
+               <dc:Bounds height="-1" width="-1" x="0" y="0"/>
+            </bpmndi:BPMNLabel>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape aei:absoluteLocation="LOC {0,0}" aei:absoluteSize="DIM {-1,-1}" aei:backgroundColor="RGB {226,226,226}" aei:backgroundImageLocation="icons/bpmn/activity/ActivityBlock.png" aei:borderColor="RGB {0,0,255}" aei:bpmNotation="EmptyTask" aei:collapsed="false" aei:drawBorder="false" aei:font="${system.default}" aei:fontColor="RGB {0,0,0}" aei:imageDisplay="true" aei:imageTextGap="4" aei:joinCondition="" aei:joinConditionLang="" aei:name="Empty2" aei:objectId="138938397544901999" aei:scaleImage="false" aei:sizeToFit="true" aei:text="" aei:textAlignment="1" aei:textFormat="1" aei:textPlacement="16" aei:transparent="true" aei:type="NONE_EVENT" bpmnElement="138938397544901999">
+            <dc:Bounds height="-1" width="-1" x="0" y="0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape aei:actySimState="0" aei:bpelName="" aei:joinConditionComp="" aei:objectId="138938807096806437" aei:type="Sequence" bpmnElement="138938397544901999wrappingSequence" isHorizontal="true">
+            <dc:Bounds height="-1" width="-1" x="0" y="0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape aei:objectId="138938396191601977" aei:type="ELSE" bpmnElement="138938396191301967elseDef">
+            <dc:Bounds height="111" width="184" x="0" y="0"/>
+            <bpmndi:BPMNLabel aei:anchor.location="4" aei:anchor.objectId="138938396191601977" aei:backgroundColor="RGB {255,255,255}" aei:objectId="138938396191701979" aei:relative.location="LOC {-9,-13}" aei:text="Else" bpmnElement="138938396191301967elseDeflabel">
+               <dc:Bounds height="13" width="19" x="0" y="0"/>
+            </bpmndi:BPMNLabel>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape aei:absoluteLocation="LOC {0,0}" aei:absoluteSize="DIM {-1,-1}" aei:backgroundColor="RGB {226,226,226}" aei:backgroundImageLocation="icons/bpmn/activity/ActivityBlock.png" aei:borderColor="RGB {0,0,255}" aei:bpmNotation="EmptyTask" aei:collapsed="false" aei:drawBorder="false" aei:font="${system.default}" aei:fontColor="RGB {0,0,0}" aei:imageDisplay="true" aei:imageTextGap="4" aei:joinCondition="" aei:joinConditionLang="" aei:name="Empty3" aei:objectId="138938398989602007" aei:scaleImage="false" aei:sizeToFit="true" aei:text="" aei:textAlignment="1" aei:textFormat="1" aei:textPlacement="16" aei:transparent="true" aei:type="NONE_EVENT" bpmnElement="138938398989602007">
+            <dc:Bounds height="-1" width="-1" x="0" y="0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape aei:actySimState="0" aei:bpelName="" aei:joinConditionComp="" aei:objectId="138938396191701981" aei:type="Sequence" bpmnElement="138938398989602007wrappingSequence" isHorizontal="true">
+            <dc:Bounds height="78" width="150" x="0" y="0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape aei:absoluteLocation="LOC {0,0}" aei:absoluteSize="DIM {-1,-1}" aei:backgroundColor="RGB {226,226,226}" aei:backgroundImageLocation="icons/bpmn/activity/ActivityBlock.png" aei:borderColor="RGB {0,0,255}" aei:bpmNotation="EmptyTask" aei:collapsed="false" aei:drawBorder="false" aei:font="${system.default}" aei:fontColor="RGB {0,0,0}" aei:imageDisplay="true" aei:imageTextGap="4" aei:joinCondition="" aei:joinConditionLang="" aei:name="Empty4" aei:objectId="138938807914706445" aei:scaleImage="false" aei:sizeToFit="true" aei:text="" aei:textAlignment="1" aei:textFormat="1" aei:textPlacement="16" aei:transparent="true" aei:type="NONE_EVENT" bpmnElement="138938807914706445">
+            <dc:Bounds height="-1" width="-1" x="0" y="0"/>
+         </bpmndi:BPMNShape>
+      </bpmndi:BPMNPlane>
+   </bpmndi:BPMNDiagram>
+   <bpel:extensions>
+      <bpel:extension mustUnderstand="no" namespace="http://www.activebpel.org/2009/02/bpel/extension/ignorable"/>
+      <bpel:extension mustUnderstand="no" namespace="http://www.omg.org/spec/BPMN/20100524/DI"/>
+      <bpel:extension mustUnderstand="yes" namespace="http://www.activebpel.org/2006/09/bpel/extension/query_handling"/>
+      <bpel:extension mustUnderstand="yes" namespace="http://www.activebpel.org/2009/06/bpel/extension/links"/>
+   </bpel:extensions>
+   <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="../wsdl/CoverageTestCases.wsdl" namespace="http://tests.bpelunit.net/CoverageTestCases/"/>
+   <bpel:partnerLinks>
+      <bpel:partnerLink aei:id="138938407533002021" myRole="Process" name="CoverageTestCases" partnerLinkType="CoverageTestCases:CoverageTestCasesPLT"/>
+   </bpel:partnerLinks>
+   <bpel:variables>
+      <bpel:variable element="CoverageTestCases:OneWayWithInt" name="OneWayWithInt"/>
+   </bpel:variables>
+   <bpel:sequence aei:id="138938395784201961">
+      <bpel:receive aei:id="138938395704901957" createInstance="yes" name="Receive" operation="OneWayWithInt" partnerLink="CoverageTestCases" variable="OneWayWithInt"/>
+      <bpel:if aei:id="138938396191301967">
+         <bpel:condition>$OneWayWithInt/in = '1'</bpel:condition>
+         <bpel:empty aei:id="138938397340801995" name="Empty1"/>
+         <bpel:elseif aei:id="138938807096806433">
+            <bpel:condition>$OneWayWithInt/in = '2'</bpel:condition>
+            <bpel:empty aei:id="138938397544901999" name="Empty2"/>
+         </bpel:elseif>
+         <bpel:else aei:id="138938396191601977">
+            <bpel:empty aei:id="138938398989602007" name="Empty3"/>
+         </bpel:else>
+      </bpel:if>
+      <bpel:empty aei:id="138938807914706445" name="Empty4"/>
+   </bpel:sequence>
+</bpel:process>
