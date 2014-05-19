@@ -8,6 +8,7 @@
 	<deployer extensionClass="net.bpelunit.framework.control.deploy.simple.TestModeDeployer" type="testmode"/>
 	<deployer extensionClass="net.bpelunit.framework.control.deploy.simple.FixedDeployer" type="fixed"/>
 	<deployer extensionClass="net.bpelunit.framework.control.deploy.ode.ODEDeployer" type="ode"/>
+	<deployer extensionClass="net.bpelunit.framework.control.deploy.wps.WPSDeployer" type="wps"/>
 	
 	<encoder type="document/literal" extensionClass="net.bpelunit.framework.control.soap.DocumentLiteralEncoder" />
 	<encoder type="rpc/literal" extensionClass="net.bpelunit.framework.control.soap.RPCLiteralEncoder" />
