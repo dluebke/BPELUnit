@@ -7,6 +7,6 @@ set +x
 # (some devs may not have it set up).
 unset CATALINA_HOME
 
-mvn clean install
-mvn -f tycho/pom.xml clean install
+mvn clean install &&
+mvn -f tycho/pom.xml clean install &&
 mvn -f net.bpelunit.dist/pom.xml clean install
