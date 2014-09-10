@@ -148,7 +148,7 @@ public class SendAsync extends Activity {
 	// ************************** ITestArtefact ************************
 
 	@Override
-	public String getName() {
+	public String getTypeName() {
 		return "Send Asynchronous";
 	}
 

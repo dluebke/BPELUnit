@@ -371,9 +371,17 @@
 					<xs:documentation>A (sync or async) two-way operation
 					</xs:documentation>
 				</xs:annotation>
-				<xs:all>
-					<xs:element name="receive" type="ReceiveActivity" />
-					<xs:element name="send" type="SendActivity" />
+				<xs:sequence>
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="receive" type="ReceiveActivity" />
+							<xs:element name="send" type="SendActivity" />
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="send" type="SendActivity" />
+							<xs:element name="receive" type="ReceiveActivity" />
+						</xs:sequence>
+					</xs:choice>
 					<xs:element name="mapping" type="Mapping" minOccurs="0" />
 					<xs:element name="headerProcessor" type="HeaderProcessor"
 						minOccurs="0">
@@ -383,7 +391,7 @@
 							</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-				</xs:all>
+				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -427,8 +435,10 @@
 		<xs:annotation>
 			<xs:documentation>A single activity</xs:documentation>
 		</xs:annotation>
-		<xs:sequence></xs:sequence>
+		<xs:sequence>
+		</xs:sequence>
 		<xs:attribute name="assume" type="xs:string"></xs:attribute>
+		<xs:attribute name="name" type="xs:string"></xs:attribute>
 		<xs:attribute name="id" type="xs:ID"></xs:attribute>
 		<xs:attribute name="dependsOn" type="xs:IDREFS"></xs:attribute>
 	</xs:complexType>
@@ -439,11 +449,8 @@
 		<xs:complexContent>
 			<xs:extension base="Activity">
 				<xs:attribute name="service" type="xs:QName" use="optional" />
-
 				<xs:attribute name="port" type="xs:string" use="optional" />
-
 				<xs:attribute name="operation" type="xs:string" use="optional" />
-
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -482,10 +489,12 @@
 	</xs:complexType>
 	<xs:complexType name="Condition">
 		<xs:all>
+			<xs:element ref="annotation" minOccurs="0" maxOccurs="1" />
 			<xs:element name="expression" type="xs:string" minOccurs="0" />
 			<xs:element name="template" type="xs:string" minOccurs="0" />
 			<xs:element name="value" type="xs:string" />
 		</xs:all>
+		<xs:attribute name="name" type="xs:string" use="optional" />
 	</xs:complexType>
 
 	<xs:complexType name="WaitActivity">
@@ -620,5 +629,14 @@
     	<xs:attribute default="testcase" name="scope" type="VariableScope" use="optional"/>
     	<xs:attribute default="string" name="type" type="ExtractionType" use="optional"/>
     </xs:complexType>
+
+	<xs:element name="annotation">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element minOccurs="1" maxOccurs="1" name="documentation" type="xs:string" />
+				<xs:any minOccurs="0" maxOccurs="unbounded" namespace="#any" processContents="lax"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 
 </xs:schema>

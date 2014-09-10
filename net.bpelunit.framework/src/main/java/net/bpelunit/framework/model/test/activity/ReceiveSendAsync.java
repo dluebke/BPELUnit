@@ -81,7 +81,7 @@ public class ReceiveSendAsync extends TwoWayAsyncActivity {
 	// ************************** ITestArtefact ************************
 
 	@Override
-	public String getName() {
+	public String getTypeName() {
 		return "Receive/Send Asynchronous";
 	}
 

@@ -51,6 +51,8 @@ public abstract class Activity implements ITestArtefact, IExtractedDataContainer
 
 	private String fAssumption;
 
+	private String fName;
+	
 	private String id;
 
 	private List<String> dependsOn = new ArrayList<String>();
@@ -129,9 +131,22 @@ public abstract class Activity implements ITestArtefact, IExtractedDataContainer
 		fAssumption = assumption;
 	}
 
+	
+	/**
+	 * Used for returning a name if this object does not have a name set
+	 * @return
+	 */
+	public abstract String getTypeName();
+	
 	// ********************** ITestArtefact ******************
 
-	public abstract String getName();
+	public final String getName() {
+		if(fName != null) {
+			return fName;
+		} else {
+			return getTypeName();
+		}
+	} 
 
 	public ArtefactStatus getStatus() {
 		return fStatus;
@@ -189,6 +204,10 @@ public abstract class Activity implements ITestArtefact, IExtractedDataContainer
 
 	private String getId() {
 		return this.id;
+	}
+	
+	public void setName(String name) {
+		this.fName = name;
 	}
 	
 	public void setDependsOn(List<String> newDependsOn) {

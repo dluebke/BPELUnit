@@ -104,7 +104,7 @@ public class CompleteHumanTask extends Activity {
 	}
 
 	@Override
-	public String getName() {
+	public String getTypeName() {
 		return "Complete Human Task";
 	}
 

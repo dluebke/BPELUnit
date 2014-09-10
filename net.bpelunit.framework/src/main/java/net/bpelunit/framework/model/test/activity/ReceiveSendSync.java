@@ -131,7 +131,7 @@ public class ReceiveSendSync extends TwoWaySyncActivity {
 	// ************************** ITestArtefact ************************
 
 	@Override
-	public String getName() {
+	public String getTypeName() {
 		return "Receive/Send Synchronous";
 	}
 

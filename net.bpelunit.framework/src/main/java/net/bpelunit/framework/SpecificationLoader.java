@@ -612,13 +612,15 @@ public class SpecificationLoader {
 		List<XMLActivity> activities = ActivityUtil.getActivities(xmlHumanPartnerTrack);
 		
 		for(XMLActivity xmlActivity : activities) {
+			Activity activity;
 			if(xmlActivity instanceof XMLCompleteHumanTaskActivity) {
-				CompleteHumanTask activity = createCompleteHumanTaskActivity(
+				activity = createCompleteHumanTaskActivity(
 						pTrack, testDirectory, (XMLCompleteHumanTaskActivity)xmlActivity);
-				pTrack.addActivity(activity);
 			} else {
 				throw new SpecificationException("Unknown Activity in Human Partner Track " + pTrack.getName() + ": " + xmlActivity.getDomNode().getLocalName());
 			}
+			pTrack.addActivity(activity);
+			activity.setName(xmlActivity.getName());
 		}
 	}
 
@@ -807,6 +809,7 @@ public class SpecificationLoader {
 				}
 				a.setId(event.getId());
 				a.setDependsOn(event.getDependsOn());
+				a.setName(event.getName());
 			}
 
 			partnerTrack.setActivities(activities);

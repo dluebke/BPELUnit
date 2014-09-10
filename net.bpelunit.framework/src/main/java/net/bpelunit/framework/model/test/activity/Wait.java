@@ -31,7 +31,7 @@ public class Wait extends Activity {
 	}
 
 	@Override
-	public String getName() {
+	public String getTypeName() {
 		return "Wait";
 	}
 
