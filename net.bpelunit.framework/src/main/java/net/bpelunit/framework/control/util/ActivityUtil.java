@@ -12,6 +12,7 @@ import net.bpelunit.framework.xml.suite.XMLActivity;
 import net.bpelunit.framework.xml.suite.XMLCompleteHumanTaskActivity;
 import net.bpelunit.framework.xml.suite.XMLCondition;
 import net.bpelunit.framework.xml.suite.XMLHeaderProcessor;
+import net.bpelunit.framework.xml.suite.XMLHumanPartnerTrack;
 import net.bpelunit.framework.xml.suite.XMLMapping;
 import net.bpelunit.framework.xml.suite.XMLReceiveActivity;
 import net.bpelunit.framework.xml.suite.XMLSendActivity;
@@ -356,6 +357,29 @@ public final class ActivityUtil {
 		}
 		return activities;
 	}
+	
+	/**
+	 * Returns all the activities of a human partner track.
+	 * 
+	 * @param xmlhumanPartnerTrack
+	 * @return
+	 */
+	public static List<XMLActivity> getActivities(XMLHumanPartnerTrack xmlhumanPartnerTrack) {
+		List<XMLActivity> activities = new ArrayList<XMLActivity>();
+		XmlCursor newCursor = xmlhumanPartnerTrack.newCursor();
+		
+		try {
+			if (newCursor.toFirstChild()) {
+				addActivity(activities, newCursor.getObject());
+				while (newCursor.toNextSibling()) {
+					addActivity(activities, newCursor.getObject());
+				}
+			}
+		} finally {
+			newCursor.dispose();
+		}
+		return activities;
+	}
 
 	/**
 	 * Returns the parent activity of an XMLObject. This method starts its
@@ -546,6 +570,8 @@ public final class ActivityUtil {
 			return toTrack.addNewSendReceiveAsynchronous();
 		case SEND_RECEIVE_SYNC:
 			return toTrack.addNewSendReceive();
+		case WAIT:
+			return toTrack.addNewWait();
 		}
 		return null;
 	}

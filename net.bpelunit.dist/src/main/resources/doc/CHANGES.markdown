@@ -10,10 +10,20 @@ Staged for next version
 * _Feature_: Eclipse tooling supports running a test case from the context menu
 * _Feature_: Eclipse runner supports "halt on error" and "halt on failure"
 * _Feature_: Activities can have execution dependencies across partner tracks. This way it is possible to defer a send activity until another activity has been finished
+* _Feature_: the ActiveBPEL deployer can now take a username and password for deployment. Authentication for composition invocation still needs to be provided using custom HTTP headers in the send activities of the client track ("protocol options").
+* _Feature_: One-Way Sends (Asynchronous Send Only) can now transmit WS-Addressing headers
+* _Feature_: Allow WS-HT Partner Tracks without password
+* _Feature_: Editor supports deleting WS-HT Complete Task activities 
+* _Feature_: Editor supports data sources, suite/test setup sections and Velocity templates
 * _Improvement_: Set a default base URL when creating a new test case in Eclipse tooling
 * _Improvement_: Do not allow duplicate test case names when running a test suite
 * _Improvement_: Internal clean-ups in framework
 * _Architecture_: Old code coverage code is in progress of being replaced with a new implementation
+* _Improvement_: Upgrade to Jetty 8 (uses Servlet 3.0, same as recent ODE releases)
+* _Fix_: Add defined WS-HT Tracks to a test case when creating a new one
+* _Fix_: Place RPC wrapper in the empty namespace when the soap:body binding element does not use the 'namespace' attribute
+* _Fix_: Validate on loading a Test Suite whether condition groups that are used in normal SOAP activities are declared in the test suite (Issue BPELUnit-9)
+* _Fix_: Read ID from CompleteHumanTask activities so that dependsOn works also when target activity is triggered by a complete human task
 
 Version 1.6.1
 -----------------------

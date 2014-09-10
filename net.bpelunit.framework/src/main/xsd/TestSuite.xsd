@@ -186,7 +186,7 @@
 		</xs:annotation>
 		<xs:sequence minOccurs="0" maxOccurs="unbounded">
 			<xs:choice>
-				<xs:element name="sendOnly" type="SendActivity">
+				<xs:element name="sendOnly" type="SendOnlyActivity">
 					<xs:annotation>
 						<xs:documentation>
 							Send a message and wait for an ACK.
@@ -303,6 +303,22 @@
 					use="optional" />
 				<xs:attribute name="faultcode" type="xs:QName" use="optional" />
 				<xs:attribute name="faultstring" type="xs:string" use="optional" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="SendOnlyActivity">
+		<xs:annotation>
+			<xs:documentation>A standalone (async) send activity. In contrast to the send activities embedded in two-way activities, this activity can have a header processor.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="SendActivity">
+				<xs:sequence>
+					<xs:element name="headerProcessor" type="HeaderProcessor" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Header processor. Can add addressing info to outgoing calls and extract it from incoming calls.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -574,20 +590,29 @@
 		<xs:attribute name="name" type="xs:string"></xs:attribute>
 	</xs:complexType>
 
-    <xs:complexType name="DataExtraction">
-    	<xs:sequence/>
-    	<xs:attribute name="expression" type="xs:string" use="required"></xs:attribute>
-    	<xs:attribute name="variable" type="xs:string" use="required"></xs:attribute>
-    	<xs:attribute name="scope" type="VariableScope" use="required"></xs:attribute>
-    </xs:complexType>
-
     <xs:simpleType name="VariableScope">
     	<xs:restriction base="xs:string">
-    		<xs:enumeration value="activity"></xs:enumeration>
-    		<xs:enumeration value="partnertrack"></xs:enumeration>
-    		<xs:enumeration value="testcase"></xs:enumeration>
-    		<xs:enumeration value="testsuite"></xs:enumeration>
+		<xs:enumeration value="activity"/>
+		<xs:enumeration value="partnertrack"/>
+		<xs:enumeration value="testcase"/>
+		<xs:enumeration value="testsuite"/>
+	</xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ExtractionType">
+	<xs:restriction base="xs:string">
+		<xs:enumeration value="string"/>
+		<xs:enumeration value="node"/>
+		<xs:enumeration value="nodeset"/>
     	</xs:restriction>
     </xs:simpleType>
-</xs:schema>
 
+    <xs:complexType name="DataExtraction">
+    	<xs:sequence/>
+    	<xs:attribute name="expression" type="xs:string" use="required"/>
+    	<xs:attribute name="variable" type="xs:string" use="required"/>
+    	<xs:attribute default="testsuite" name="scope" type="VariableScope" use="optional"/>
+    	<xs:attribute default="string" name="type" type="ExtractionType" use="optional"/>
+    </xs:complexType>
+
+</xs:schema>

@@ -28,6 +28,7 @@ import net.bpelunit.framework.xml.suite.XMLHumanPartnerTrack;
 import net.bpelunit.framework.xml.suite.XMLMapping;
 import net.bpelunit.framework.xml.suite.XMLReceiveActivity;
 import net.bpelunit.framework.xml.suite.XMLSendActivity;
+import net.bpelunit.framework.xml.suite.XMLSendOnlyActivity;
 import net.bpelunit.framework.xml.suite.XMLSoapActivity;
 import net.bpelunit.framework.xml.suite.XMLTrack;
 import net.bpelunit.framework.xml.suite.XMLTwoWayActivity;
@@ -51,6 +52,8 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -157,7 +160,14 @@ public class ActivitySection extends TreeSection {
 						moreActivities.add(twoWayActivity.getHeaderProcessor());
 					return moreActivities.toArray();
 				}
-				// XMLSendActivity has no children
+				if(activity instanceof XMLSendOnlyActivity) {
+					XMLSendOnlyActivity xmlSendOnlyActivity = (XMLSendOnlyActivity)activity;
+					if(xmlSendOnlyActivity.getHeaderProcessor() != null) {
+						return new Object[] { xmlSendOnlyActivity.getHeaderProcessor() };
+					} else {
+						return new Object[0];
+					}
+				}
 			}
 			return new Object[0];
 		}
@@ -174,6 +184,10 @@ public class ActivitySection extends TreeSection {
 			if (element instanceof XMLReceiveActivity)
 				return ((XMLReceiveActivity) element).getConditionList().size() > 0;
 
+			if(element instanceof XMLSendOnlyActivity) {
+				return ((XMLSendOnlyActivity)element).getHeaderProcessor() != null;
+			}
+				
 			return false;
 		}
 
@@ -260,7 +274,7 @@ public class ActivitySection extends TreeSection {
 			switch (activityConstant) {
 			case SEND_ONLY:
 				wizard = new SendOnlyWizard(getPage(), ActivityEditMode.EDIT,
-						(XMLSendActivity) currentActivity);
+						(XMLSendOnlyActivity) currentActivity);
 				break;
 			case RECEIVE_ONLY:
 				wizard = new ReceiveOnlyWizard(getPage(), ActivityEditMode.EDIT,
@@ -287,6 +301,9 @@ public class ActivitySection extends TreeSection {
 				break;
 			case COMPLETEHUMANTASK:
 				wizard = new CompleteHumanTaskActivityWizard((XMLCompleteHumanTaskActivity)currentActivity);
+				break;
+			default:
+				ToolSupportActivator.logErrorMessage("Unknown activity type " + activityConstant);
 			}
 			if (wizard != null) {
 				if (code != null)
@@ -326,7 +343,11 @@ public class ActivitySection extends TreeSection {
 
 		Object viewerSelection = getViewerSelection();
 		if (ActivityUtil.isActivity(viewerSelection)) {
-			removeActivity(fCurrentPartnerTrack, viewerSelection);
+			if(fCurrentPartnerTrack != null) {
+				removeActivity(fCurrentPartnerTrack, viewerSelection);
+			} else {
+				removeActivity(fCurrentHumanPartnerTrack, viewerSelection);
+			}
 		} // endif XMLActivity
 		else if (viewerSelection instanceof XMLMapping) {
 			XMLActivity activity = ActivityUtil.getParentActivityFor(viewerSelection);
@@ -345,6 +366,7 @@ public class ActivitySection extends TreeSection {
 		else if (viewerSelection instanceof XMLCondition) {
 			XMLCondition cond = (XMLCondition) viewerSelection;
 			XmlCursor cursor = cond.newCursor();
+			try {
 			if (cursor.toParent()) {
 				XmlObject parent = cursor.getObject();
 				if (parent instanceof XMLReceiveActivity) {
@@ -353,10 +375,24 @@ public class ActivitySection extends TreeSection {
 					if (index != -1)
 						rcvOp.removeCondition(index);
 				}
+			} 
+			} finally { 
+				cursor.dispose();
 			}
-			cursor.dispose();
 		} // endif XMLCondition
 		adjust(false);
+	}
+
+	private void removeActivity(XMLHumanPartnerTrack currentPartnerTrack,
+			Object activityToRemove) {
+		int index = currentPartnerTrack.getCompleteHumanTaskList().indexOf(activityToRemove);
+		
+		if(index >= 0) {
+			ToolSupportActivator.log(new Status(
+					IStatus.INFO, ToolSupportActivator.PLUGIN_ID,
+					"Removing CompleteHumanTask[" + index + "]"));
+			currentPartnerTrack.removeCompleteHumanTask(index);
+		}
 	}
 
 	@Override
@@ -396,10 +432,10 @@ public class ActivitySection extends TreeSection {
 	}
 
 	private void removeActivity(XMLTrack track, Object activity) {
-		System.out.println("Removing activity " + activity);
 		int index = getActivityIndex(track, activity);
 		if (index != -1) {
-			switch (ActivityUtil.getActivityConstant(activity)) {
+			final ActivityConstant activityType = ActivityUtil.getActivityConstant(activity);
+			switch (activityType) {
 			case SEND_ONLY:
 				fCurrentPartnerTrack.removeSendOnly(index);
 				break;
@@ -419,9 +455,13 @@ public class ActivitySection extends TreeSection {
 				fCurrentPartnerTrack.removeReceiveSendAsynchronous(index);
 				break;
 			case WAIT:
-				System.out.println("Removing WAIT[" + index + "]");
+				ToolSupportActivator.log(new Status(
+					IStatus.INFO, ToolSupportActivator.PLUGIN_ID,
+					"Removing WAIT[" + index + "]"));
 				fCurrentPartnerTrack.removeWait(index);
 				break;
+			default:
+				ToolSupportActivator.logErrorMessage("Unknown activity type " + activityType);
 			}
 		}
 	}
@@ -431,7 +471,7 @@ public class ActivitySection extends TreeSection {
 		if (index != -1) {
 			switch (type) {
 			case SEND_ONLY:
-				fCurrentPartnerTrack.setSendOnlyArray(index, (XMLSendActivity) theReplacement);
+				fCurrentPartnerTrack.setSendOnlyArray(index, (XMLSendOnlyActivity) theReplacement);
 				break;
 			case RECEIVE_ONLY:
 				fCurrentPartnerTrack
@@ -451,6 +491,8 @@ public class ActivitySection extends TreeSection {
 				fCurrentPartnerTrack.setReceiveSendAsynchronousArray(index,
 						(XMLTwoWayActivity) theReplacement);
 				break;
+			default:
+				ToolSupportActivator.logErrorMessage("Unknown activity type " + type);
 			}
 		}
 	}
@@ -772,7 +814,7 @@ public class ActivitySection extends TreeSection {
 
 		switch (constant) {
 		case SEND_ONLY: {
-			XMLSendActivity sendOp = fCurrentPartnerTrack.addNewSendOnly();
+			XMLSendOnlyActivity sendOp = fCurrentPartnerTrack.addNewSendOnly();
 
 			// Initialize the activity:
 			sendOp.setService(new QName(""));
@@ -880,6 +922,8 @@ public class ActivitySection extends TreeSection {
 			}
 			break;
 		}
+		default:
+			ToolSupportActivator.logErrorMessage("Unknown activity constant " + constant);
 		}
 		if (added != null) {
 			adjust(false);
