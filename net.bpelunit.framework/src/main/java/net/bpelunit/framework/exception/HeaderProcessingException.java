@@ -22,7 +22,7 @@ public class HeaderProcessingException extends BPELUnitException {
 		super(message);
 	}
 
-	public HeaderProcessingException(String string, SOAPException e) {
+	public HeaderProcessingException(String string, Exception e) {
 		super(string, e);
 	}
 
