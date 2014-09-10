@@ -18,6 +18,7 @@ import net.bpelunit.framework.xml.suite.XMLSendActivity;
 import net.bpelunit.framework.xml.suite.XMLSoapActivity;
 import net.bpelunit.framework.xml.suite.XMLTrack;
 import net.bpelunit.framework.xml.suite.XMLTwoWayActivity;
+import net.bpelunit.framework.xml.suite.XMLWaitActivity;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.xmlbeans.XmlCursor;
@@ -302,6 +303,10 @@ public final class ActivityUtil {
 			XMLCompleteHumanTaskActivity xml = (XMLCompleteHumanTaskActivity) presumedActivity;
 			return xml.getTaskName() + " ("
 					+ ActivityUtil.getNiceName(presumedActivity) + ")";
+		}
+		if(presumedActivity instanceof XMLWaitActivity) {
+			XMLWaitActivity wait = (XMLWaitActivity)presumedActivity;
+			return "Wait (" + wait.getWaitForMilliseconds() + "ms)";
 		}
 
 		if (ActivityUtil.isActivity(presumedActivity)) {
