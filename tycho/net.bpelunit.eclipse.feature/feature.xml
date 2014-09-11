@@ -12,6 +12,7 @@ e is rolled out at the client-side. Therefore, all software development methodol
 
    <copyright>
       (c) 2006-2009 Leibniz Universität Hannover
+(c) 2009-2014 The BPELUnit Project
    </copyright>
 
    <license url="http://www.eclipse.org/org/documents/epl-v10.php">
@@ -107,6 +108,7 @@ This Agreement is governed by the laws of the State of New York and the intellec
    <url>
       <update label="BPELUnit Update Site" url="http://update.bpelunit.net"/>
       <discovery label="University of Hannover Site" url="http://www.se.uni-hannover.de/forschung/soa/bpelunit/"/>
+      <discovery label="BPELUnit Homepage" url="http://www.bpelunit.net"/>
    </url>
 
    <includes
