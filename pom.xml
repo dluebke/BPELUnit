@@ -473,6 +473,7 @@
     <module>net.bpelunit.framework.control.datasource.html</module>
     <module>net.bpelunit.framework.control.datasource.ods</module>
     <module>net.bpelunit.framework.control.deploy.activevos9</module>
+    <module>net.bpelunit.framework.control.soap.genericsoapheaderprocessor</module>
     <module>net.bpelunit.util</module>
     <module>net.bpelunit.utils.bptstool</module>
     <module>net.bpelunit.utils.bpelstats</module>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="net.bpelunit.framework.client.eclipse.headerProcessor">
+      <headerProcessor
+            id="net.bpelunit.framework.control.soap.genericsoapheaderprocessor.headerProcessor1"
+            name="generic"
+            processorClass="net.bpelunit.framework.control.soap.genericsoapheaderprocessor.GenericSOAPHeaderProcessorTest">
+      </headerProcessor>
+   </extension>
+</plugin>

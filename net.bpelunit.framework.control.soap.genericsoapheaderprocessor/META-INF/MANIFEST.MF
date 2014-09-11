@@ -1,0 +1,30 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1410358185978
+Build-Jdk: 1.7.0_03
+Built-By: daniell
+Bundle-ActivationPolicy: lazy
+Bundle-Description: BPEL has become the defacto standard language for co
+ mposing Web services. However, as every other programming language deve
+ lopers can introduce defects into the code that can lead to undesired c
+ onsequences when the software is rolled out at the client-side. Therefo
+ re, all software development methodologies include testing as one of th
+ e important activities. For nearly every programming language, a unit t
+ esting framework exists, for example JUnit for Java. These testing fram
+ eworks allow developers to easily test small chunks of the code that th
+ ey have written. Until recently, BPEL lacked such support. However, BPE
+ LUnit was developed for closing this gap.
+Bundle-License: http://www.eclipse.org/legal/epl-v10.html
+Bundle-ManifestVersion: 2
+Bundle-Name: BPELUnit :: Generic SOAP Header Processor
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.bpelunit.framework.control.deployer.activevos9;
+ singleton:=true
+Bundle-Vendor: Leibniz Universität Hannover
+Bundle-Version: 1.6.2.201409101609
+Created-By: Apache Maven Bundle Plugin
+Import-Package: javax.xml.namespace,javax.xml.parsers,javax.xml.transfor
+ m,javax.xml.transform.dom,javax.xml.transform.stream,org.apache.commons
+ .io,org.jdom,org.jdom.filter,org.w3c.dom,org.xml.sax
+Require-Bundle: net.bpelunit.framework.client.eclipse,net.bpelunit.frame
+ work
+Tool: Bnd-1.50.0

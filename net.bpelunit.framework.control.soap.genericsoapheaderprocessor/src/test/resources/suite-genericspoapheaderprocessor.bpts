@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tes:testSuite xmlns:tes="http://www.bpelunit.org/schema/testSuite" xmlns:suit="http://test.bpelunit.net/suite-genericspoapheaderprocessor/">
+    <tes:name>suite-genericspoapheaderprocessor.bpts</tes:name>
+    <tes:baseURL>http://localhost:7777/ws</tes:baseURL>
+    <tes:deployment>
+        <tes:put type="fixed" name="SomeName">
+            <tes:wsdl>suite-genericspoapheaderprocessor.wsdl</tes:wsdl>
+        </tes:put>
+        <tes:partner name="Track2" wsdl="suite-genericspoapheaderprocessor.wsdl" partnerWsdl=""/>
+    </tes:deployment>
+    <tes:testCases>
+        <tes:testCase name="OneWaySendAndReceive" basedOn="" abstract="false" vary="false">
+            <tes:clientTrack>
+                <tes:sendOnly service="suit:suite-genericspoapheaderprocessor" port="suite-genericspoapheaderprocessorSOAP" operation="OneWayOperation" fault="false">
+                    <tes:data>
+                        <suit:OneWayOperation>
+                            <in>Hello World</in>
+                        </suit:OneWayOperation>
+                    </tes:data>
+                    <tes:headerProcessor name="generic">
+                        <tes:property name="SOAPHeader">&lt;ns:MyHeader xmlns:ns="myNamespace">MyHeaderValue&lt;/ns:MyHeader></tes:property>
+                    </tes:headerProcessor>
+                </tes:sendOnly>
+            </tes:clientTrack>
+            <tes:partnerTrack name="Track2">
+                <tes:receiveOnly service="suit:suite-genericspoapheaderprocessor" port="suite-genericspoapheaderprocessorSOAP" operation="OneWayOperation" fault="false">
+                    <tes:headerProcessor name="generic">
+                        <tes:property name="Assertion">//*[local-name(.)='MyHeader' and namespace-uri(.) = 'myNamespace'] = 'MyHeaderValue'</tes:property>
+                    </tes:headerProcessor>
+                </tes:receiveOnly>
+            </tes:partnerTrack>
+        </tes:testCase>
+        <tes:testCase name="TwoWaySendReceive" basedOn="" abstract="false" vary="false">
+            <tes:clientTrack>
+                <tes:sendReceive service="suit:suite-genericspoapheaderprocessor" port="suite-genericspoapheaderprocessorSOAP" operation="TwoWayOperation">
+                    <tes:send service="suit:suite-genericspoapheaderprocessor" port="suite-genericspoapheaderprocessorSOAP" fault="false">
+                        <tes:data>
+                            <suit:TwoWayOperation>
+                                <in>Hello World</in>
+                            </suit:TwoWayOperation>
+                        </tes:data>
+                    </tes:send>
+                    <tes:receive service="suit:suite-genericspoapheaderprocessor" port="suite-genericspoapheaderprocessorSOAP" fault="false"/>
+                    <tes:headerProcessor name="generic">
+                        <tes:property name="SOAPHeader">&lt;ns:MyHeader xmlns:ns="myNamespace">MyHeaderValue&lt;/ns:MyHeader></tes:property>
+                        <tes:property name="Assertion">//*[local-name(.)='MyHeader' and namespace-uri(.) = 'myNamespace'] = 'MyHeaderValue'</tes:property>
+                    </tes:headerProcessor>
+                </tes:sendReceive>
+            </tes:clientTrack>
+            <tes:partnerTrack name="Track2">
+                <tes:receiveSend service="suit:suite-genericspoapheaderprocessor" port="suite-genericspoapheaderprocessorSOAP" operation="TwoWayOperation">
+                    <tes:send service="suit:suite-genericspoapheaderprocessor" port="suite-genericspoapheaderprocessorSOAP" fault="false">
+                        <tes:data>
+                            <suit:TwoWayOperation>
+                                <in>Hello World</in>
+                            </suit:TwoWayOperation>
+                        </tes:data>
+                    </tes:send>
+                    <tes:receive service="suit:suite-genericspoapheaderprocessor" port="suite-genericspoapheaderprocessorSOAP" fault="false"/>
+                    <tes:headerProcessor name="generic">
+                        <tes:property name="SOAPHeader">&lt;ns:MyHeader xmlns:ns="myNamespace">MyHeaderValue&lt;/ns:MyHeader></tes:property>
+                        <tes:property name="Assertion">//*[local-name(.)='MyHeader' and namespace-uri(.) = 'myNamespace'] = 'MyHeaderValue'</tes:property>
+                    </tes:headerProcessor>
+                </tes:receiveSend>
+            </tes:partnerTrack>
+        </tes:testCase>
+        <tes:testCase name="TwoWaySendReceiveAssertionFails" basedOn="" abstract="false" vary="false">
+            <tes:clientTrack>
+                <tes:sendReceive service="suit:suite-genericspoapheaderprocessor" port="suite-genericspoapheaderprocessorSOAP" operation="TwoWayOperation">
+                    <tes:send service="suit:suite-genericspoapheaderprocessor" port="suite-genericspoapheaderprocessorSOAP" fault="false">
+                        <tes:data>
+                            <suit:TwoWayOperation>
+                                <in>Hello World</in>
+                            </suit:TwoWayOperation>
+                        </tes:data>
+                    </tes:send>
+                    <tes:receive service="suit:suite-genericspoapheaderprocessor" port="suite-genericspoapheaderprocessorSOAP" fault="false"/>
+                    <tes:headerProcessor name="generic">
+                        <tes:property name="SOAPHeader">&lt;ns:MyHeader xmlns:ns="myNamespace">MyHeaderValue&lt;/ns:MyHeader></tes:property>
+                        <tes:property name="Assertion">//*[local-name(.)='MyHeader' and namespace-uri(.) = 'myNamespace'] = 'MyHeaderValue'</tes:property>
+                    </tes:headerProcessor>
+                </tes:sendReceive>
+            </tes:clientTrack>
+            <tes:partnerTrack name="Track2">
+                <tes:receiveSend service="suit:suite-genericspoapheaderprocessor" port="suite-genericspoapheaderprocessorSOAP" operation="TwoWayOperation">
+                    <tes:send service="suit:suite-genericspoapheaderprocessor" port="suite-genericspoapheaderprocessorSOAP" fault="false">
+                        <tes:data>
+                            <suit:TwoWayOperation>
+                                <in>Hello World</in>
+                            </suit:TwoWayOperation>
+                        </tes:data>
+                    </tes:send>
+                    <tes:receive service="suit:suite-genericspoapheaderprocessor" port="suite-genericspoapheaderprocessorSOAP" fault="false"/>
+                    <tes:headerProcessor name="generic">
+                        <tes:property name="SOAPHeader">&lt;ns:MyHeader xmlns:ns="myNamespace">MyHeaderValue&lt;/ns:MyHeader></tes:property>
+                        <tes:property name="Assertion">//*[local-name(.)='MyWrongHeader' and namespace-uri(.) = 'myNamespace'] = 'MyHeaderValue'</tes:property>
+                    </tes:headerProcessor>
+                </tes:receiveSend>
+            </tes:partnerTrack>
+        </tes:testCase>
+    </tes:testCases>
+</tes:testSuite>

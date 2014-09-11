@@ -14,6 +14,7 @@
 	<encoder type="rpc/literal" extensionClass="net.bpelunit.framework.control.soap.RPCLiteralEncoder" />
 	
 	<headerProcessor type="wsa" extensionClass="net.bpelunit.framework.control.soap.WSAHeaderProcessor" />
+	<headerProcessor type="generic" extensionClass="net.bpelunit.framework.control.soap.GenericSOAPHeaderProcessor" />
 
 	<dataSource type="velocity" extensionClass="net.bpelunit.framework.control.datasource.VelocityDataSource" />
 	<dataSource type="csv" extensionClass="net.bpelunit.framework.control.datasource.csv.CSVDataSource"/>

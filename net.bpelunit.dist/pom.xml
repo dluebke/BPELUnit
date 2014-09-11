@@ -98,5 +98,10 @@
       <artifactId>deployer-activevos9</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>generic-soap-header-processor</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>

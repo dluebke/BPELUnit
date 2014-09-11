@@ -350,6 +350,11 @@
 							</xs:documentation>
 						</xs:annotation>
 					</xs:element>
+					<xs:element name="headerProcessor" type="HeaderProcessor" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Header processor. Can add addressing info to outgoing calls and extract it from incoming calls.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
 					<xs:element name="dataExtraction" type="DataExtraction"
 						minOccurs="0" maxOccurs="unbounded">
 					</xs:element>
