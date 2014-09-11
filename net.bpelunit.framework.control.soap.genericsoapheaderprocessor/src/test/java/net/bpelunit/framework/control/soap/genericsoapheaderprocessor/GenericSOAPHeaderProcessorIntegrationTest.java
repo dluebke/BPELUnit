@@ -27,7 +27,7 @@ public class GenericSOAPHeaderProcessorIntegrationTest {
 		runner.testRun();
 		
 		assertEquals(2, runner.getPassed());
-		assertEquals(0, runner.getProblems());
+		assertEquals(1, runner.getProblems());
 	}
 	
 }
