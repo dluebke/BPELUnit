@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1410423770760
+Bnd-LastModified: 1410425620483
 Build-Jdk: 1.7.0_67
 Built-By: daniell
 Bundle-ActivationPolicy: lazy
@@ -17,13 +17,20 @@ Bundle-License: http://www.eclipse.org/legal/epl-v10.html
 Bundle-ManifestVersion: 2
 Bundle-Name: BPELUnit :: Generic SOAP Header Processor
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-SymbolicName: net.bpelunit.framework.control.deployer.activevos9;
- singleton:=true
+Bundle-SymbolicName: net.bpelunit.framework.control.soap.genericsoaphead
+ erprocessor;singleton:=true
 Bundle-Vendor: Leibniz Universität Hannover
-Bundle-Version: 1.6.2.201409111022
+Bundle-Version: 1.6.2.201409111053
 Created-By: Apache Maven Bundle Plugin
-Import-Package: javax.xml.namespace,javax.xml.parsers,javax.xml.transfor
- m,javax.xml.transform.dom,javax.xml.transform.stream,org.apache.commons
+Export-Package: net.bpelunit.framework.control.soap.genericsoapheaderpro
+ cessor;uses:="javax.xml.xpath,net.bpelunit.framework.model.test.activit
+ y,net.bpelunit.framework.control.ext,net.bpelunit.framework.exception,j
+ avax.xml.soap,org.w3c.dom,javax.xml.namespace";version="1.6.2.201409111
+ 053"
+Import-Package: javax.xml.namespace,javax.xml.parsers,javax.xml.soap,jav
+ ax.xml.transform,javax.xml.transform.dom,javax.xml.transform.stream,jav
+ ax.xml.xpath,net.bpelunit.framework.control.ext,net.bpelunit.framework.
+ exception,net.bpelunit.framework.model.test.activity,org.apache.commons
  .io,org.jdom,org.jdom.filter,org.w3c.dom,org.xml.sax
 Require-Bundle: net.bpelunit.framework.client.eclipse,net.bpelunit.frame
  work

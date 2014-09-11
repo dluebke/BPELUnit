@@ -33,10 +33,10 @@
 				<artifactId>maven-bundle-plugin</artifactId>
 				<configuration>
 					<instructions>
-						<Export-Package>net.bpelunit.framework.control.deploy.activevos9</Export-Package>
+						<Export-Package>net.bpelunit.framework.control.soap.genericsoapheaderprocessor</Export-Package>
 						<Private-Package>net.bpelunit.util,active_endpoints.*,com.active_endpoints.*</Private-Package>
 						<Bundle-SymbolicName>
-							net.bpelunit.framework.control.deployer.activevos9;singleton:=true
+							net.bpelunit.framework.control.soap.genericsoapheaderprocessor;singleton:=true
 						</Bundle-SymbolicName>
 						<Require-Bundle>
 							net.bpelunit.framework.client.eclipse,net.bpelunit.framework

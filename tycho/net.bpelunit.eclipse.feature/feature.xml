@@ -197,13 +197,6 @@ This Agreement is governed by the laws of the State of New York and the intellec
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-         
-   <plugin
-         id="net.bpelunit.framework.control.soap.genericsoapheaderprocessor"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
 
    <plugin
          id="net.bpelunit.model.bpel"
@@ -221,6 +214,13 @@ This Agreement is governed by the laws of the State of New York and the intellec
 
    <plugin
          id="net.bpelunit.util"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.bpelunit.framework.control.soap.genericsoapheaderprocessor"
          download-size="0"
          install-size="0"
          version="0.0.0"

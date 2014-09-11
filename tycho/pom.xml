@@ -121,6 +121,12 @@
       </dependency>
       <dependency>
           <groupId>${project.groupId}</groupId>
+          <artifactId>generic-soap-header-processor</artifactId>
+          <version>${project.version}</version>
+          <classifier>bundle</classifier>
+      </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
           <artifactId>model-bpel</artifactId>
           <version>${project.version}</version>
           <classifier>bundle</classifier>
