@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1410425620483
+Bnd-LastModified: 1410771394562
 Build-Jdk: 1.7.0_67
 Built-By: daniell
 Bundle-ActivationPolicy: lazy
@@ -20,13 +20,13 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-SymbolicName: net.bpelunit.framework.control.soap.genericsoaphead
  erprocessor;singleton:=true
 Bundle-Vendor: Leibniz Universität Hannover
-Bundle-Version: 1.6.2.201409111053
+Bundle-Version: 1.6.2.201409151056
 Created-By: Apache Maven Bundle Plugin
 Export-Package: net.bpelunit.framework.control.soap.genericsoapheaderpro
  cessor;uses:="javax.xml.xpath,net.bpelunit.framework.model.test.activit
  y,net.bpelunit.framework.control.ext,net.bpelunit.framework.exception,j
- avax.xml.soap,org.w3c.dom,javax.xml.namespace";version="1.6.2.201409111
- 053"
+ avax.xml.soap,org.w3c.dom,javax.xml.namespace";version="1.6.2.201409151
+ 056"
 Import-Package: javax.xml.namespace,javax.xml.parsers,javax.xml.soap,jav
  ax.xml.transform,javax.xml.transform.dom,javax.xml.transform.stream,jav
  ax.xml.xpath,net.bpelunit.framework.control.ext,net.bpelunit.framework.
