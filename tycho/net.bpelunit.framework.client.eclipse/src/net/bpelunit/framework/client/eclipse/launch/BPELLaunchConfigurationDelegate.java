@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
+import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -53,13 +54,14 @@ import org.eclipse.ui.views.IViewDescriptor;
  * @author Philip Mayer
  * 
  */
-public class BPELLaunchConfigurationDelegate implements
-		ILaunchConfigurationDelegate {
+public class BPELLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 
 	public void launch(ILaunchConfiguration configuration, String mode,
 			ILaunch launch, IProgressMonitor monitor) throws CoreException {
 
 		try {
+			saveBeforeLaunch(configuration, mode, monitor);
+			
 			String projectName = configuration.getAttribute(
 					LaunchConstants.ATTR_PROJECT_NAME, "");
 			String fileName = configuration.getAttribute(
