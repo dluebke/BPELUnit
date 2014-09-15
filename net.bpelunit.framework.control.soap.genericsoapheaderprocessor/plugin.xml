@@ -4,8 +4,8 @@
    <extension
          point="net.bpelunit.framework.client.eclipse.headerProcessor">
       <headerProcessor
-            id="net.bpelunit.framework.control.soap.genericsoapheaderprocessor.headerProcessor1"
-            name="generic"
+            id="generic"
+            name="Generic SOAP Header Processor"
             processorClass="net.bpelunit.framework.control.soap.genericsoapheaderprocessor.GenericSOAPHeaderProcessorTest">
       </headerProcessor>
    </extension>
