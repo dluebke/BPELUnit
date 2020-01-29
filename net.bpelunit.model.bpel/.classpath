@@ -21,7 +21,7 @@
 	<classpathentry excluding="**/*.java" kind="src" path="src/main/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="target/generated-classes/xmlbeans"/>
-	<classpathentry kind="lib" path="target/dependency/xmlbeans-2.4.0.jar"/>
+	<classpathentry kind="lib" path="E:/sync/dluebke/workspaces/bpelunit.current/bpelunit/net.bpelunit.model.bpel/target/dependency/xmlbeans-3.1.0.jar"/>
 	<classpathentry kind="src" path="/net.bpelunit.util"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6">
 		<attributes>

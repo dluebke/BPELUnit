@@ -11,7 +11,7 @@
 	<classpathentry kind="lib" path="target/dependency/commons-io-1.3.2.jar"/>
 	<classpathentry kind="lib" path="target/dependency/jdom-1.1.3.jar"/>
 	<classpathentry kind="lib" path="target/dependency/wsdl4j-1.6.2.jar"/>
-	<classpathentry kind="lib" path="target/dependency/xmlbeans-2.4.0.jar"/>
+	<classpathentry kind="lib" path="E:/sync/dluebke/workspaces/bpelunit.current/bpelunit/net.bpelunit.utils.bptstool/target/dependency/xmlbeans-3.1.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -20,7 +20,7 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="target/dependency/ant-1.8.1.jar"/>
 	<classpathentry kind="lib" path="target/dependency/ant-launcher-1.8.1.jar"/>
-	<classpathentry kind="lib" path="target/dependency/log4j-1.2.15.jar"/>
+	<classpathentry kind="lib" path="E:/sync/dluebke/workspaces/bpelunit.current/bpelunit/net.bpelunit.framework.client.ant/target/dependency/log4j-1.2.17.jar"/>
 	<classpathentry kind="lib" path="target/dependency/commons-lang-2.4.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
