@@ -7,8 +7,14 @@ package net.bpelunit.test.end2end;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import static org.junit.Assert.assertTrue;
 
+import net.bpelunit.framework.control.result.XMLResultProducer;
 import net.bpelunit.framework.exception.ConfigurationException;
 import net.bpelunit.framework.exception.DeploymentException;
 import net.bpelunit.framework.exception.SpecificationException;
@@ -133,7 +139,7 @@ public class End2EndTester {
 	}
 	
 	@Test
-	public void testSendOnlyWSA() throws ConfigurationException, SpecificationException, DeploymentException {
+	public void testSendOnlyWSA() throws ConfigurationException, SpecificationException, DeploymentException, FileNotFoundException, IOException {
 		TestTestRunner runner = new TestTestRunner(BASEPATH + "05_WSASendOnly/", "async-wsa.bpts");
 		runner.getTestSuite().addResultListener(new ITestResultListener() {
 			
@@ -153,8 +159,29 @@ public class End2EndTester {
 		runner.testRun();
 		assertEquals(1, runner.getPassed());
 		assertEquals(0, runner.getProblems());
+	}
+	
+	@Test
+	public void testParallel()  throws ConfigurationException, SpecificationException, DeploymentException, FileNotFoundException, IOException {
+		TestTestRunner runner = new TestTestRunner(BASEPATH + "06_Parallel/", "ParallelWastePaperBasketTestSuite.bpts");
+		runner.getTestSuite().addResultListener(new ITestResultListener() {
+			
+			@Override
+			public void testCaseStarted(TestCase testCase) {
+			}
+			
+			@Override
+			public void testCaseEnded(TestCase testCase) {
+			}
+			
+			@Override
+			public void progress(ITestArtefact testArtefact) {
+			}
+		});
 		
-		ITestArtefact iTestArtefact = runner.getTestSuite(). getChildren().get(0);
-		System.out.println(iTestArtefact.getClass().getName());
+		runner.testRun();
+		XMLResultProducer.writeXML(new FileOutputStream("test.xml"), runner.getTestSuite());
+		assertEquals(runner.getErrorMessages().toString(), 1, runner.getPassed());
+		assertEquals(0, runner.getProblems());
 	}
 }

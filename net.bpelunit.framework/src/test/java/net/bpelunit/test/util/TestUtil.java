@@ -142,7 +142,7 @@ public class TestUtil {
 			throws ConfigurationException, DeploymentException, SpecificationException {
 		TestTestRunner runner = new TestTestRunner(bpts.getParent(), bpts.getName());
 		runner.testRun();
-		assertTrue("Test suites should pass all tests", runner.getTestSuite().getStatus().isPassed());
+		assertTrue("Test suites should pass all tests: " + runner.getTestSuite().getStatus().getMessage(), runner.getTestSuite().getStatus().isPassed());
 		return runner.getTestSuite();
 	}
 

@@ -33,7 +33,7 @@ public class WSHTTest {
 	public void testWSHTTestSuite() throws ConfigurationException, DeploymentException, SpecificationException {
 		TestTestRunner runner = getWSHTTestSuite();
 		runner.testRun();
-		assertEquals(1, runner.getPassed());
+		assertEquals(runner.getErrorMessages().toString(), 1, runner.getPassed());
 		assertEquals(0, runner.getProblems());
 	}
 	
@@ -48,7 +48,7 @@ public class WSHTTest {
 	@Test
 	public void wshtDataExtractionWorks() throws Exception {
 		TestSuite results = TestUtil.getResults(new File(BASEPATH, "WSHTTestSuite-velocitydatacopy.bpts"));
-		assertTrue("Tests should have passed", results.getStatus().isPassed());
+		assertTrue("Tests should have passed: " + results.getStatus().getMessage(), results.getStatus().isPassed());
 	}
 
 }

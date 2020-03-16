@@ -110,14 +110,12 @@ public class DocumentLiteralEncoder implements ISOAPEncoder {
 				Object current = i.next();
 				if (current instanceof SOAPElement) {
 					SOAPElement element = (SOAPElement) current;
-					rawRoot.appendChild(rawRoot.getOwnerDocument().importNode(
-							element, true));
+					rawRoot.appendChild(rawRoot.getOwnerDocument().importNode(element, true));
 				}
 
 				if (current instanceof Text) {
 					Text element = (Text) current;
-					rawRoot.appendChild(rawRoot.getOwnerDocument().importNode(
-							element, true));
+					rawRoot.appendChild(rawRoot.getOwnerDocument().importNode(element, true));
 				}
 
 			}

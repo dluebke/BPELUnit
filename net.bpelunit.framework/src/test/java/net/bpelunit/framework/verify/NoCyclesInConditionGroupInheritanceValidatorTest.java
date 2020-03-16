@@ -1,16 +1,14 @@
 package net.bpelunit.framework.verify;
 
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import net.bpelunit.framework.exception.SpecificationException;
 import net.bpelunit.framework.xml.suite.XMLConditionGroup;
 import net.bpelunit.framework.xml.suite.XMLConditionGroupSection;
 import net.bpelunit.framework.xml.suite.XMLTestSuite;
 import net.bpelunit.framework.xml.suite.XMLTestSuiteDocument;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 
 public class NoCyclesInConditionGroupInheritanceValidatorTest {

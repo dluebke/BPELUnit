@@ -1,10 +1,14 @@
 package net.bpelunit.framework.model.test.data;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.xml.namespace.NamespaceContext;
+
+import org.apache.velocity.context.Context;
+import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlObject;
+import org.w3c.dom.Element;
 
 import net.bpelunit.framework.exception.SpecificationException;
 import net.bpelunit.framework.model.test.PartnerTrack;
@@ -15,11 +19,6 @@ import net.bpelunit.framework.model.test.report.ArtefactStatus;
 import net.bpelunit.framework.model.test.report.ITestArtefact;
 import net.bpelunit.framework.model.test.report.StateData;
 import net.bpelunit.framework.xml.suite.XMLAnyElement;
-
-import org.apache.velocity.context.Context;
-import org.apache.xmlbeans.XmlException;
-import org.apache.xmlbeans.XmlObject;
-import org.w3c.dom.Element;
 
 public class CompleteHumanTaskSpecification extends DataSpecification {
 
@@ -124,7 +123,7 @@ public class CompleteHumanTaskSpecification extends DataSpecification {
 		ContextXPathVariableResolver variableResolver = new ContextXPathVariableResolver(conditionContext);
 
 		for (ReceiveCondition c : conditions) {
-			c.evaluate(partnerTrack, (Element)inputXMLData.getDomNode(), getNamespaceContext(), variableResolver);
+			c.evaluate(partnerTrack, (Element)inputXMLData.getDomNode(), getNamespaceContext(), variableResolver, true);
 
 			if (c.isFailure()) {
 				setStatus(ArtefactStatus.createFailedStatus(String.format(

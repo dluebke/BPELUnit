@@ -49,15 +49,16 @@ public final class ActivityUtil {
 	 */
 	public enum ActivityConstant {
 
-		SEND_ONLY("sendOnly", "Send Asynchronous"), RECEIVE_ONLY("receiveOnly",
-				"Receive Asynchronous"), SEND_RECEIVE_SYNC("sendReceive",
-				"Send/Receive Synchronous"), RECEIVE_SEND_SYNC("receiveSend",
-				"Receive/Send Synchronous"), SEND_RECEIVE_ASYNC(
-				"sendReceiveAsynchronous", "Send/Receive Asynchronous"), RECEIVE_SEND_ASYNC(
-				"receiveSendAsynchronous", "Receive/Send Asynchronous"), SEND(
-				"send", "Send"), RECEIVE("receive", "Receive"), WAIT("wait",
-				"Wait"), COMPLETEHUMANTASK("completeHumanTask",
-				"Complete Human Task");
+		SEND_ONLY("sendOnly", "Send Asynchronous"), 
+		RECEIVE_ONLY("receiveOnly", "Receive Asynchronous"), 
+		SEND_RECEIVE_SYNC("sendReceive", "Send/Receive Synchronous"), 
+		RECEIVE_SEND_SYNC("receiveSend", "Receive/Send Synchronous"), 
+		SEND_RECEIVE_ASYNC("sendReceiveAsynchronous", "Send/Receive Asynchronous"), 
+		RECEIVE_SEND_ASYNC("receiveSendAsynchronous", "Receive/Send Asynchronous"), 
+		SEND("send", "Send"),
+		RECEIVE("receive", "Receive"),
+		WAIT("wait", "Wait"),
+		COMPLETEHUMANTASK("completeHumanTask", "Complete Human Task");
 
 		private String fXmlName;
 		private String fNiceName;
@@ -567,6 +568,10 @@ public final class ActivityUtil {
 			return toTrack.addNewSendReceive();
 		case WAIT:
 			return toTrack.addNewWait();
+		case SEND:
+		case RECEIVE:
+		case COMPLETEHUMANTASK:
+			return null;
 		}
 		return null;
 	}
