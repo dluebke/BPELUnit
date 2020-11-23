@@ -49,7 +49,7 @@ public final class TestSuiteStats {
 			if(bptsFileList.size() == 1) {
 				stats = calculateStatisticsForTestSuite(bptsFileList.get(0));
 			} else {
-				StatisticGroup g = new StatisticGroup("Overall");
+				StatisticGroup g = new StatisticGroup(AbstractStatisticEntry.TYPE_TESTSUITES, "Overall");
 				
 				for(String bptsFile : bptsFileList) {
 					g.add(calculateStatisticsForTestSuite(bptsFile));
@@ -78,8 +78,9 @@ public final class TestSuiteStats {
 	}
 
 	private static void writeStatistics(PrintStream out, IStatisticEntry stats) {
-		out.println(String.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
-				"Name", 
+		out.println(String.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+				"Name",
+				"Type",
 				"All Receives",
 				"All Sends",
 				"Complete Human Tasks",

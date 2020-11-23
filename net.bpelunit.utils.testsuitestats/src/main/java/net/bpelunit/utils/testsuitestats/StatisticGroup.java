@@ -8,13 +8,15 @@ public class StatisticGroup extends AbstractStatisticEntry {
 
 	private List<IStatisticEntry> entries = new ArrayList<IStatisticEntry>();
 	private String title;
+	private String type;
 
-	public StatisticGroup(String initialTitle) {
+	public StatisticGroup(String type, String initialTitle) {
+		this.type = type;
 		title = initialTitle;
 	}
 
-	public StatisticGroup(String title, List<IStatisticEntry> initialEntries) {
-		this(title);
+	public StatisticGroup(String type, String title, List<IStatisticEntry> initialEntries) {
+		this(type, title);
 		entries.addAll(initialEntries);
 	}
 	
@@ -151,6 +153,11 @@ public class StatisticGroup extends AbstractStatisticEntry {
 	@Override
 	public List<IStatisticEntry> getSubStatistics() {
 		return Collections.unmodifiableList(entries);
+	}
+
+	@Override
+	public String getType() {
+		return type;
 	}
 
 }

@@ -9,7 +9,7 @@ import net.bpelunit.framework.xml.suite.XMLTrack;
 public class StatisticsGatherer {
 
 	public IStatisticEntry gatherStatistics(XMLTestSuite ts) {
-		StatisticGroup testSuiteStats = new StatisticGroup(ts.getName());
+		StatisticGroup testSuiteStats = new StatisticGroup(AbstractStatisticEntry.TYPE_TESTSUITE, ts.getName());
 
 		for (XMLTestCase tc : ts.getTestCases().getTestCaseList()) {
 			testSuiteStats.add(gatherStatistics(tc));
@@ -19,7 +19,7 @@ public class StatisticsGatherer {
 	}
 
 	private IStatisticEntry gatherStatistics(XMLTestCase tc) {
-		StatisticGroup testCaseStats = new StatisticGroup(tc.getName());
+		StatisticGroup testCaseStats = new StatisticGroup(AbstractStatisticEntry.TYPE_TESTCASE, tc.getName());
 
 		for (XMLHumanPartnerTrack h : tc.getHumanPartnerTrackList()) {
 			testCaseStats.add(gatherStatistics(h, tc.getName()));
@@ -46,8 +46,9 @@ public class StatisticsGatherer {
 		boolean partnerTrackUsed = (0 + countReceiveOnly + countReceiveSend
 				+ countSendOnly + countSendReceive + countWait) > 0;
 
-		AbstractStatisticEntry partnerStats = new StatisticLeaf(testCaseName + "."
-				+ "client", 0, countReceiveOnly, countReceiveSend,
+		AbstractStatisticEntry partnerStats = new StatisticLeaf(
+				AbstractStatisticEntry.TYPE_TESTTRACK,
+				testCaseName + "." + "client", 0, countReceiveOnly, countReceiveSend,
 				countSendOnly, countSendReceive, countWait,
 				countSendReceiveAsync, countReceiveSendAsync, partnerTrackUsed);
 
@@ -57,7 +58,9 @@ public class StatisticsGatherer {
 	private IStatisticEntry gatherStatistics(XMLHumanPartnerTrack h,
 			String testCaseName) {
 		int countCompleteHumanTask = h.getCompleteHumanTaskList().size();
-		AbstractStatisticEntry partnerStats = new StatisticLeaf(testCaseName + "."
+		AbstractStatisticEntry partnerStats = new StatisticLeaf(
+				AbstractStatisticEntry.TYPE_TESTTRACK,
+				testCaseName + "."
 				+ h.getName(), countCompleteHumanTask, 0, 0, 0, 0, 0, 0, 0,
 				false);
 
@@ -74,7 +77,9 @@ public class StatisticsGatherer {
 		int countReceiveSendAsync = p.getReceiveSendAsynchronousList().size();
 		int countSendReceiveAsync = p.getSendReceiveAsynchronousList().size();
 
-		AbstractStatisticEntry partnerStats = new StatisticLeaf(testCaseName + "."
+		AbstractStatisticEntry partnerStats = new StatisticLeaf(
+				AbstractStatisticEntry.TYPE_TESTTRACK,
+				testCaseName + "."
 				+ p.getName(), 0, countReceiveOnly, countReceiveSend,
 				countSendOnly, countSendReceive, countWait,
 				countSendReceiveAsync, countReceiveSendAsync, false);

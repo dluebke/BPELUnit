@@ -14,6 +14,7 @@ public class StatisticLeaf extends AbstractStatisticEntry {
 	private int countWait;
 	private boolean partnerTrackUsed;
 	private String title;
+	private String type;
 
 	/**
 	 * Constructor for this leaf. A leaf does not contain child nodes but
@@ -30,10 +31,11 @@ public class StatisticLeaf extends AbstractStatisticEntry {
 	 * @param sendReceiveAsync
 	 * @param isPartnerTrackUsed
 	 */
-	public StatisticLeaf(String initalTitle, int completeHumanTask,
+	public StatisticLeaf(String type, String initalTitle, int completeHumanTask,
 			int receiveOnly, int receiveSend, int sendOnly, int sendReceive,
 			int wait, int receiveSendAsync, int sendReceiveAsync,
 			boolean isPartnerTrackUsed) {
+		this.type = type;
 		this.title = initalTitle;
 		this.countCompleteHumanTask = completeHumanTask;
 		this.countReceiveOnly = receiveOnly;
@@ -148,6 +150,11 @@ public class StatisticLeaf extends AbstractStatisticEntry {
 	@Override
 	public List<IStatisticEntry> getSubStatistics() {
 		return Collections.emptyList();
+	}
+	
+	@Override
+	public String getType() {
+		return type;
 	}
 
 }
